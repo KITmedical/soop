@@ -1,6 +1,8 @@
 
 #include "problem.hpp"
 
+using namespace soop; // TODO
+
 bool is_x_coord(e<int>) {throw std::logic_error{"not implmented"};}
 bool is_y_coord(e<int>) {throw std::logic_error{"not implmented"};}
 

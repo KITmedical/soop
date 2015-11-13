@@ -6,6 +6,9 @@
 #include <memory>
 #include <string>
 
+namespace soop {
+
+
 template<typename T>
 using fun_pointer = T*;
 
@@ -68,5 +71,7 @@ template<typename...Args>
 std::unique_ptr<basic_dynamic_relation> prepare_relation(fun_pointer<bool(Args...)> f) {
 	return std::make_unique<dynamic_relation_fun<bool, Args...>>(f);
 }
+
+} // namespace soop
 
 #endif

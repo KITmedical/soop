@@ -6,6 +6,8 @@
 
 #include "problem.hpp"
 
+using namespace soop; // TODO
+
 using v1 = var<'v','1'>;
 using v2 = var<'v','2'>;
 using v3 = var<'v','3'>;

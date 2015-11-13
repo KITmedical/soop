@@ -8,6 +8,8 @@
 
 #include "spass.hpp"
 
+namespace soop {
+
 using ignore = std::initializer_list<int>;
 
 template <typename Head, typename... Tail>
@@ -116,5 +118,7 @@ struct functions {
 		return join<Fs...>(",\n");
 	}
 };
+
+} // namespace soop
 
 #endif

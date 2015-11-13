@@ -6,6 +6,8 @@
 
 #include "problem.hpp"
 
+namespace soop {
+
 void basic_problem::add(entity& e) {
 	e.m_id = m_entities.size();
 	m_entities.push_back(&e);
@@ -133,3 +135,7 @@ void basic_problem::remove_entity(std::size_t id) {
 	m_entities[id] = nullptr;
 	m_known_relations.erase(id);
 }
+
+
+} //namespace soop
+

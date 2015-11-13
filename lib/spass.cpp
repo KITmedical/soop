@@ -6,6 +6,8 @@
 
 #include "spass.hpp"
 
+namespace soop {
+
 struct line : std::string {
 	using std::string::basic_string;
 };
@@ -42,3 +44,5 @@ bool try_proof(const std::string& problem) {
 	throw std::runtime_error{"Didn't find an answer"};
 }
 
+
+} // namespace soop

@@ -10,6 +10,8 @@
 #include "relation.hpp"
 #include "free_vars.hpp"
 
+namespace soop {
+
 template<typename F>
 using fun_ptr = F*;
 
@@ -170,6 +172,8 @@ public:
 private:
 	T m_value;
 };
+
+} // namespace soop
 
 #endif
 

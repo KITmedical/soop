@@ -7,6 +7,8 @@
 
 #include "primitives.hpp"
 
+namespace soop {
+
 template <char... String>
 struct var {
 	static std::string to_string() { return std::string{String...}; }
@@ -82,6 +84,8 @@ template<typename... Ts>
 using get_var_list = typename impl::collect_var_list<var_list<>, var_list<Ts...>>::type;
 
 static_assert(std::is_same<get_var_list<int, x, double, y, z>, var_list<x,y,z>>::value, "");
+
+} // namespace soop
 
 #endif
 

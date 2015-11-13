@@ -3,6 +3,10 @@
 
 #include <string>
 
+namespace soop {
+
 bool try_proof(const std::string& request);
+
+} // namespace soop
 
 #endif

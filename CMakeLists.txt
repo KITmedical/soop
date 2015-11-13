@@ -5,9 +5,15 @@ cmake_minimum_required(VERSION 2.8)
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -std=c++14" )
 
-file(GLOB source_files "src/*.cpp")
-file(GLOB header_files "src/*.hpp")
+include_directories("include/soop")
 
-add_executable(soop ${source_files} ${header_files})
+file(GLOB lib_headers "include/soop/*.hpp")
+file(GLOB lib_code    "lib/*.cpp")
+file(GLOB demo_code   "demo/*.cpp")
+
+add_library(soop ${lib_headers} ${lib_code})
+
+add_executable(soop_demo ${demo_code})
+target_link_libraries(soop_demo soop)
 
 
