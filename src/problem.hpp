@@ -8,6 +8,7 @@
 
 #include "primitives.hpp"
 #include "relation.hpp"
+#include "free_vars.hpp"
 
 template<typename F>
 using fun_ptr = F*;
@@ -76,13 +77,22 @@ public:
 	}
 	template<typename... FArgs, typename...Args>
 	bool request_satisfication(const fun_ptr<bool(FArgs...)> rel, Args&&... args) {
-		return request( "formula(" + rel_string_id(rel) + "(" + entity_join(args...) + ")).\n" );
+		return request_satisfication(std::integral_constant<bool, has_free_var<Args...>()>{},
+			rel, std::forward<Args>(args)...);
 	}
 protected:
 	std::string dyn_fun_list() const;
 	std::string dyn_rel_list() const;
 	std::string dyn_axiom_list() const;
 private:
+	template<typename... FArgs, typename...Args>
+	bool request_satisfication(std::false_type, const fun_ptr<bool(FArgs...)> rel, Args&&... args) {
+		return request( "formula(" + rel_string_id(rel) + "(" + entity_join(args...) + ")).\n" );
+	}
+	template<typename... FArgs, typename...Args>
+	bool request_satisfication(std::true_type, const fun_ptr<bool(FArgs...)> rel, Args&&... args) {
+		return request( "formula(exists(" + get_var_list<Args...>::to_string() +", " + rel_string_id(rel) + "(" + entity_join(args...) + "))).\n" );
+	}
 	std::unordered_map<std::size_t, std::size_t> m_dynamic_relations;
 	std::vector<const entity*> m_entities;
 	std::vector<std::vector<std::size_t>> m_dynamic_axioms;

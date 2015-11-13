@@ -23,20 +23,6 @@ std::string entity_join(const Head& h, const Tail&...t) {
 	(void)ignore{(ret += ", ", ret += t.entity_id_name(), 0)...};
 	return ret;
 }
-
-template <char... String>
-struct var {
-	static std::string to_string() { return std::string{String...}; }
-	static std::string name() {return to_string();}
-	static unsigned rank() {return 0;}
-};
-
-using v = var<'v'>;
-using w = var<'w'>;
-using x = var<'x'>;
-using y = var<'y'>;
-using z = var<'z'>;
-
 template <typename... Values>
 struct set {
 	static std::string to_string() { return "[" + join<Values...>() + "]"; }

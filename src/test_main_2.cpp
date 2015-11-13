@@ -66,9 +66,11 @@ int test_main_2() try {
 		std::cout << "We should never get here\n";
 		return 1;
 	} catch (std::runtime_error&) {
-		std::cout << "Caught exception from bad argument\n";
+		std::cout << "Succesfully caught exception from bad argument\n";
 	}
 	require(prob.request_satisfication(is_coordpair, p1.x, p1.y), "x and y should be a pair");
+	require(prob.request_satisfication(is_coordpair, p1.x, v{}), "There should exist a pair with p1.x as x-coord");
+	require(!prob.request_satisfication(is_coordpair, p1.y, v{}), "There should not be a pair with p1.y as x-coord");
 	return 0;
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';
