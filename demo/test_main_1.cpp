@@ -16,7 +16,7 @@ using v4 = var<'v','4'>;
 bool test_pred1(const e<v1>& l, const e<v2>& r) {
 	assert(l.problem() == r.problem() and l.problem() != nullptr);
 	auto& p = *l.problem();
-	return p.request("formula(dynamic_relation_" + std::to_string(reinterpret_cast<std::size_t>(&test_pred1)) + "(" + l.entity_id_name() + ", " + r.entity_id_name() + ")).");
+	return p.request_satisfication(test_pred1, l, r);
 }
 bool test_pred2(const e<v1>&, const e<v2>&) { throw std::logic_error{""}; }
 
