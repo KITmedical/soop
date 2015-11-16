@@ -50,30 +50,30 @@ TEST_CASE("instances") {
 
 	e<v1> i1{p};
 	e<v2> i2{p};
-	REQUIRE(p.request(formula<less<v1, v4>>{}));
-	REQUIRE(not p.request(formula<less<v3, v2>>{}));
-	REQUIRE(p.request("formula(instance("+i1.entity_id_name()+", "+v1::name()+"))."));
-	REQUIRE(not p.request("formula(instance("+i1.entity_id_name()+", "+v2::name()+"))."));
-	REQUIRE(not p.request("formula(instance("+i2.entity_id_name()+", "+v1::name()+"))."));
-	REQUIRE(p.request("formula(instance("+i2.entity_id_name()+", "+v2::name()+"))."));
+	CHECK(p.request(formula<less<v1, v4>>{}));
+	CHECK_FALSE(p.request(formula<less<v3, v2>>{}));
+	CHECK(p.request("formula(instance("+i1.entity_id_name()+", "+v1::name()+"))."));
+	CHECK_FALSE(p.request("formula(instance("+i1.entity_id_name()+", "+v2::name()+"))."));
+	CHECK_FALSE(p.request("formula(instance("+i2.entity_id_name()+", "+v1::name()+"))."));
+	CHECK(p.request("formula(instance("+i2.entity_id_name()+", "+v2::name()+"))."));
 
 	auto i3 = std::move(i1);
 
-	REQUIRE(p.request("formula(instance("+i3.entity_id_name()+", "+v1::name()+"))."));
-	REQUIRE(not p.request("formula(instance("+i3.entity_id_name()+", "+v2::name()+"))."));
+	CHECK(p.request("formula(instance("+i3.entity_id_name()+", "+v1::name()+"))."));
+	CHECK_FALSE(p.request("formula(instance("+i3.entity_id_name()+", "+v2::name()+"))."));
 
 	p.add_relation(test_pred1);
 	p.add_relation(test_pred2);
 
-	REQUIRE(not p.request_satisfication(test_pred1, i3, i2));
+	CHECK_FALSE(p.request_satisfication(test_pred1, i3, i2));
 
 	p.declare_satifies(test_pred1, i3, i2);
 
-	REQUIRE(p.request_satisfication(test_pred1, i3, i2));
+	CHECK(p.request_satisfication(test_pred1, i3, i2));
 
 	auto i4 = i3;
 
-	REQUIRE(p.request_satisfication(test_pred1, i4, i2));
-	REQUIRE(test_pred1(i4, i2));
+	CHECK(p.request_satisfication(test_pred1, i4, i2));
+	CHECK(test_pred1(i4, i2));
 }
 

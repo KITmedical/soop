@@ -21,4 +21,5 @@ target_link_libraries(soop_demo soop)
 add_executable(soop_test ${test_code})
 target_link_libraries(soop_test soop)
 add_test(NAME soop-test COMMAND soop_test)
+enable_testing(true)
 
