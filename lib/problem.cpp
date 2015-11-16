@@ -16,7 +16,11 @@ void basic_problem::add(entity& e) {
 void basic_problem::clone(entity& e, std::size_t orig_id) {
 	add(e);
 	const auto new_id = e.m_id;
-	for(auto rel: m_known_relations.at(orig_id)) {
+	const auto rel_it = m_known_relations.find(orig_id);
+	if (rel_it == m_known_relations.end()) {
+		return;
+	}
+	for(auto rel: rel_it->second) {
 		auto rels = m_dynamic_axioms.at(rel);
 		std::transform(rels.begin(), rels.end(), rels.begin(),
 				[&](std::size_t i) { return i == orig_id ? new_id : i;});
@@ -129,8 +133,11 @@ void basic_problem::reseat_entity(std::size_t id, const entity& e) {
 }
 void basic_problem::remove_entity(std::size_t id) {
 	assert(id < m_entities.size() and m_entities[id] != nullptr);
-	for (auto i: m_known_relations.at(id)) {
-		m_dynamic_axioms[i] = {};
+	auto rels_it = m_known_relations.find(id);
+	if (rels_it != m_known_relations.end()) {
+		for (auto i: m_known_relations.at(id)) {
+			m_dynamic_axioms[i] = {};
+		}
 	}
 	m_entities[id] = nullptr;
 	m_known_relations.erase(id);
