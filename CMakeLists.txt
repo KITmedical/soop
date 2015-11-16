@@ -7,13 +7,18 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wconversion -
 
 include_directories("include/soop")
 
+
 file(GLOB lib_headers "include/soop/*.hpp")
 file(GLOB lib_code    "lib/*.cpp")
 file(GLOB demo_code   "demo/*.cpp")
+file(GLOB test_code   "test/*.cpp")
 
 add_library(soop ${lib_headers} ${lib_code})
 
 add_executable(soop_demo ${demo_code})
 target_link_libraries(soop_demo soop)
 
+add_executable(soop_test ${test_code})
+target_link_libraries(soop_test soop)
+add_test(NAME soop-test COMMAND soop_test)
 
