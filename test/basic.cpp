@@ -59,15 +59,21 @@ TEST_CASE("instances") {
 	e<v2> i2{p};
 	CHECK(p.request(formula<less<v1, v4>>{}));
 	CHECK_FALSE(p.request(formula<less<v3, v2>>{}));
+
+	// Any string works:
 	CHECK(p.request("formula(instance("+i1.entity_id_name()+", "+v1::name()+"))."));
-	CHECK_FALSE(p.request("formula(instance("+i1.entity_id_name()+", "+v2::name()+"))."));
-	CHECK_FALSE(p.request("formula(instance("+i2.entity_id_name()+", "+v1::name()+"))."));
-	CHECK(p.request("formula(instance("+i2.entity_id_name()+", "+v2::name()+"))."));
+
+	// But in general the typed version is preferable:
+	CHECK(p.request_satisfication(pred<instance>{}, i1, type<v1>{}));
+	CHECK(p.request_satisfication(pred<instance>{}, i2, type<v2>{}));
+
+	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i1, type<v2>{}));
+	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i2, type<v1>{}));
 
 	auto i3 = std::move(i1);
 
-	CHECK(p.request("formula(instance("+i3.entity_id_name()+", "+v1::name()+"))."));
-	CHECK_FALSE(p.request("formula(instance("+i3.entity_id_name()+", "+v2::name()+"))."));
+	CHECK(p.request_satisfication(pred<instance>{}, i3, type<v1>{}));
+	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i3, type<v2>{}));
 
 	p.add_relation(test_pred1);
 	p.add_relation(test_pred2);

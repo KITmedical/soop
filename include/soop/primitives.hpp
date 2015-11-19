@@ -49,6 +49,9 @@ struct and_ {
 	static std::string to_string() { return "and(" + join<Values...>() + ")"; }
 };
 
+struct instance {
+	static std::string name() { return "instance"; }
+};
 
 template <typename... Values>
 struct or_ {
