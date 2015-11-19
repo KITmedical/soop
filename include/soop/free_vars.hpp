@@ -12,9 +12,6 @@ namespace soop {
 template <char... String>
 struct var {
 	static std::string to_string() { return std::string{String...}; }
-	static std::string name() {return to_string();}
-	static unsigned rank() {return 0;}
-
 	static std::string entity_id_name() {return to_string(); }
 
 	template<typename T>

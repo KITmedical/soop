@@ -5,10 +5,17 @@
 
 #include <catch.hpp>
 
-using v1 = soop::var<'v','1'>;
-using v2 = soop::var<'v','2'>;
-using v3 = soop::var<'v','3'>;
-using v4 = soop::var<'v','4'>;
+template<char...Name>
+struct util_type {
+	static std::string name() { return std::string{Name...}; }
+	static std::string to_string() { return name(); }
+	static std::size_t rank() { return 0; }
+};
+
+using v1 = util_type<'v','1'>;
+using v2 = util_type<'v','2'>;
+using v3 = util_type<'v','3'>;
+using v4 = util_type<'v','4'>;
 
 bool test_pred1(const soop::e<v1>& l, const soop::e<v2>& r) {
 	assert(l.problem() == r.problem() and l.problem() != nullptr);
