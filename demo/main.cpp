@@ -43,9 +43,7 @@ struct int_ {
 	static std::size_t rank() { return 0; }
 };
 template<typename T>
-struct dummy_pred {
-	static std::string name() {return "dummy_pred";}
-	static std::string to_string() { return name() + "(" + T::to_string() + ")"; }
+struct dummy_pred : soop::make_function<dummy_pred<soop::x>> {
 	static std::size_t rank() { return 1; }
 };
 

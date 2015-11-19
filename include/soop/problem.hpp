@@ -173,6 +173,7 @@ private:
 	T m_value;
 };
 
+
 } // namespace soop
 
 #endif

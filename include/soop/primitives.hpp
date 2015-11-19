@@ -119,6 +119,25 @@ struct functions {
 	}
 };
 
+template<typename Self>
+struct make_function {
+	static std::string name() {
+		return "static_predicate_" + std::to_string(reinterpret_cast<std::size_t>(&name));
+	}
+	template<typename...Args>
+	static std::string to_string(const Args&... args) {
+		auto str = name() + "(";
+		(void) ignore{(str += (args.name() + ','),0)...};
+		if (sizeof...(Args)) {
+			str.pop_back();
+		}
+		str += ')';
+		return str;
+	}
+	static constexpr std::size_t rank() {return 0;}
+};
+
+
 } // namespace soop
 
 #endif
