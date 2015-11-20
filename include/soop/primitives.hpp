@@ -12,11 +12,24 @@ namespace soop {
 
 using ignore = std::initializer_list<int>;
 
+namespace impl {
+template<typename...Ts>
+struct type_list{};
+
 template <typename Head, typename... Tail>
-std::string join(const std::string& delim = ", ") {
+std::string join(type_list<Head, Tail...>, const std::string& delim) {
 	auto ret = Head::to_string();
 	(void)ignore{(ret += delim, ret += Tail::to_string(), 0)...};
 	return ret;
+}
+
+inline std::string join(type_list<>, const std::string&) { return ""; }
+
+} // namespace impl
+
+template<typename...Args>
+std::string join(const std::string& delim = ",") {
+	return impl::join(impl::type_list<Args...>{}, delim);
 }
 
 template <typename Head, typename... Tail>

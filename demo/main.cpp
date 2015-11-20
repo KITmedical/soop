@@ -42,16 +42,12 @@ struct int_ {
 	static std::string to_string() {return "int";}
 	static std::size_t rank() { return 0; }
 };
-template<typename T>
-struct dummy_pred : soop::make_function<dummy_pred<soop::x>> {
-	static std::size_t rank() { return 1; }
-};
 
 int main() try {
 	auto prob = problem<
 		functions<function<int_>>,
-		predicates<predicate<dummy_pred<x>>>,
-		formulae<formula<dummy_pred<int_>>>
+		predicates<>,
+		formulae<>
 	>{};
 	prob.add_relation(is_x_coord);
 	prob.add_relation(is_y_coord);
