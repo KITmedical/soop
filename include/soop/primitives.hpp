@@ -5,10 +5,47 @@
 #include <vector>
 #include <initializer_list>
 #include <string>
+#include <typeindex>
 
 #include "spass.hpp"
 
 namespace soop {
+
+
+template<typename F>
+using fun_ptr = F*;
+
+template<typename T>
+struct pred{};
+template<typename T>
+struct type {
+	static std::string entity_id_name() { return T::name(); }
+};
+
+template<typename Rel>
+std::size_t rel_id(pred<Rel>) {
+	return Rel::id();
+}
+
+template<typename...Args>
+std::size_t rel_id(fun_ptr<bool(Args...)> f) {
+	return reinterpret_cast<std::size_t>(f);
+}
+
+
+inline std::string rel_string_id(std::size_t address) {
+	return "relation_" + std::to_string(address);
+}
+
+template<typename...Args>
+std::string rel_string_id(fun_ptr<bool(Args...)> f) {
+	return rel_string_id(rel_id(f));
+}
+
+template<typename Rel>
+std::string rel_string_id(pred<Rel> rel) {
+	return rel_string_id(rel_id(rel));
+}
 
 using ignore = std::initializer_list<int>;
 
@@ -60,12 +97,6 @@ struct implies {
 template <typename... Values>
 struct and_ {
 	static std::string to_string() { return "and(" + join<Values...>() + ")"; }
-};
-
-struct instance {
-	static std::size_t id() { return reinterpret_cast<std::size_t>(&id); }
-	static std::size_t rank() { return 2; }
-	static std::string name() { return "instance"; }
 };
 
 template <typename... Values>
@@ -128,6 +159,15 @@ struct function {
 	static std::string to_string() {
 		return "(" + F::name() + ", " + std::to_string(F::rank()) + ")";
 	}
+	static std::type_index type_index() {
+		return F::type_index();
+	}
+	static std::string name() {
+		return F::name();
+	}
+	static std::size_t rank() {
+		return F::rank();
+	}
 };
 
 template<typename...Fs>
@@ -137,24 +177,40 @@ struct functions {
 	}
 };
 
-template<typename Self>
-struct make_function {
+template<typename Self, std::size_t Rank = 0>
+struct make_function_impl {
 	static std::string name() {
-		return "static_predicate_" + std::to_string(reinterpret_cast<std::size_t>(&name));
+		return rel_string_id(pred<make_function_impl<Self>>{});
+	}
+	static std::size_t id() {
+		return reinterpret_cast<std::size_t>(&id);
+	}
+	static std::size_t rank() {
+		return Rank;
+	}
+	static std::type_index type_index() {
+		return std::type_index{typeid(Self)};
 	}
 	template<typename...Args>
 	static std::string to_string(const Args&... args) {
 		auto str = name() + "(";
-		(void) ignore{(str += (args.name() + ','),0)...};
 		if (sizeof...(Args)) {
+			(void) ignore{(str += (args.name() + ','),0)...};
 			str.pop_back();
 		}
 		str += ')';
 		return str;
 	}
-	static constexpr std::size_t rank() {return 0;}
 };
+template<typename Self, std::size_t Rank = 0>
+using make_function = function<make_function_impl<Self, Rank>>;
 
+template<typename Self, std::size_t Rank = 1>
+using make_predicate = predicate<make_function_impl<Self, Rank>>;
+
+
+struct instance : public make_function_impl<instance, 2> {
+};
 
 } // namespace soop
 

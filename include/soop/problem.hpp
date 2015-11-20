@@ -5,51 +5,12 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
+#include <typeindex>
 
 #include "primitives.hpp"
 #include "free_vars.hpp"
 
 namespace soop {
-
-template<typename F>
-using fun_ptr = F*;
-
-using int_lst = std::initializer_list<int>;
-
-template<typename T>
-struct pred{};
-template<typename T>
-struct type {
-	static std::string entity_id_name() { return T::name(); }
-};
-
-
-
-template<typename Rel>
-std::size_t rel_id(pred<Rel>) {
-	return Rel::id();
-}
-
-template<typename...Args>
-std::size_t rel_id(fun_ptr<bool(Args...)> f) {
-	return reinterpret_cast<std::size_t>(f);
-}
-
-
-inline std::string rel_string_id(std::size_t address) {
-	return "relation_" + std::to_string(address);
-}
-
-template<typename...Args>
-std::string rel_string_id(fun_ptr<bool(Args...)> f) {
-	return rel_string_id(rel_id(f));
-}
-
-template<typename Rel>
-std::string rel_string_id(pred<Rel> rel) {
-	return rel_string_id(rel_id(rel));
-}
-
 
 
 template<typename Functions, typename Predicates, typename Axioms>
@@ -99,17 +60,20 @@ public:
 		//static_assert(std::is_same<bool, decltype(rel(std::forward<Args>(args)...))>::value, "invalid arguments to relation");
 		const auto axiom_id = m_dynamic_axioms.size();
 		m_dynamic_axioms.push_back({rel_id(rel), (args.id())...});
-		(void) int_lst{ ((m_known_relations[args.id()].push_back(axiom_id)),0)... };
+		(void) ignore{ ((m_known_relations[args.id()].push_back(axiom_id)),0)... };
 	}
 	template<typename Rel, typename...Args>
 	bool request_satisfication(const Rel rel, Args&&... args) {
 		return request_satisfication_impl(std::integral_constant<bool, has_free_var<Args...>()>{},
 			rel_string_id(rel), std::forward<Args>(args)...);
 	}
+	std::string get_name_of(std::type_index index) const { return m_type_names.at(index); }
 protected:
 	std::string dyn_fun_list() const;
 	std::string dyn_rel_list() const;
 	std::string dyn_axiom_list() const;
+
+	std::unordered_map<std::type_index, std::string> m_type_names;
 private:
 	template<typename... FArgs, typename...Args>
 	bool request_satisfication_impl(std::false_type, const std::string& rel, Args&&... args) {
@@ -133,6 +97,11 @@ struct problem<
 	formulae<Axioms...>>
 	: basic_problem
 {
+	problem() {
+		(void) ignore{
+			(m_type_names.emplace(std::make_pair(Functions::type_index(), Functions::name())
+			),0)...};
+	}
 	template<typename Conjecture>
 	bool request(formula<Conjecture>) const {
 		return request(formula<Conjecture>::to_string());
@@ -175,13 +144,6 @@ struct problem<
 };
 
 template<typename T>
-struct type_name_helper {
-	static std::string get() {
-		return T::name();
-	}
-};
-
-template<typename T>
 class e : public entity {
 public:
 	template<typename...Args>
@@ -192,7 +154,10 @@ public:
 	const T* operator->() const {return &m_value;}
 
 	std::string instance_of() const override {
-		return type_name_helper<T>::get();
+		if (not this->problem()) {
+			throw std::logic_error{"instance_of can only be called on entities that are part of a relation"};
+		}
+		return this->problem()->get_name_of(std::type_index{typeid(T)});
 	}
 private:
 	T m_value;

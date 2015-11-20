@@ -8,13 +8,6 @@ bool is_y_coord(e<int>) {throw std::logic_error{"not implmented"};}
 
 bool is_coordpair(e<int>, e<int>) {return false;}
 
-template<>
-struct type_name_helper<int> {
-	static std::string get() {
-		return "int";
-	}
-};
-
 void require(bool b, const char what[] = "") {
 	if (not b) {
 		throw std::runtime_error{what};
@@ -36,16 +29,9 @@ struct point {
 	e<int> y;
 };
 
-
-struct int_ {
-	static std::string name() {return "int";}
-	static std::string to_string() {return "int";}
-	static std::size_t rank() { return 0; }
-};
-
 int main() try {
 	auto prob = problem<
-		functions<function<int_>>,
+		functions<make_function<int>>,
 		predicates<>,
 		formulae<>
 	>{};

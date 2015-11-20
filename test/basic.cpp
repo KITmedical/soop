@@ -10,6 +10,7 @@ struct util_type {
 	static std::string name() { return std::string{Name...}; }
 	static std::string to_string() { return name(); }
 	static std::size_t rank() { return 0; }
+	static std::type_index type_index() { return std::type_index{typeid(util_type<Name...>)}; }
 };
 
 using v1 = util_type<'v','1'>;
