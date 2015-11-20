@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "primitives.hpp"
-#include "relation.hpp"
 #include "free_vars.hpp"
 
 namespace soop {
