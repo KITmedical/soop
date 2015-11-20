@@ -13,8 +13,8 @@ soop::basic_problem& get_onto() {
 			functions<
 				make_function<std::size_t>,
 				make_function<std::string>,
-				make_function<std::unordered_map<std::size_t, std::string>>,
-				make_function<std::map<std::pair<std::size_t, std::size_t>, std::size_t>>
+				make_function<std::unordered_map<e<std::size_t>, e<std::string>>>,
+				make_function<std::map<std::pair<e<std::size_t>, e<std::size_t>>, e<std::size_t>>>
 			>,
 			predicates<>,
 			formulae<>
