@@ -77,7 +77,6 @@ protected:
 private:
 	template<typename... FArgs, typename...Args>
 	bool request_satisfication_impl(std::false_type, const std::string& rel, Args&&... args) {
-		std::cout << "rel = " << rel << '\n';
 		return request( "formula(" + rel + "(" + entity_join(args...) + ")).\n" );
 	}
 	template<typename... FArgs, typename...Args>
