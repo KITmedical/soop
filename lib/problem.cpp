@@ -4,7 +4,7 @@
 #include <iostream>
 #include <utility>
 
-#include "problem.hpp"
+#include "soop/problem.hpp"
 
 namespace soop {
 

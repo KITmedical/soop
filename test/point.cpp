@@ -1,5 +1,5 @@
 
-#include "problem.hpp"
+#include "soop/problem.hpp"
 
 #include <catch.hpp>
 

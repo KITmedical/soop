@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -std=c++14" )
 
-include_directories("include/soop")
+include_directories("include")
 
 
 file(GLOB lib_headers "include/soop/*.hpp")

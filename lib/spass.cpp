@@ -4,7 +4,7 @@
 #include <iterator>
 #include <procxx.hpp>
 
-#include "spass.hpp"
+#include "soop/spass.hpp"
 
 namespace soop {
 
