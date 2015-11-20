@@ -45,9 +45,10 @@ std::string basic_problem::dyn_fun_list() const {
 }
 
 std::string basic_problem::dyn_rel_list() const {
-	auto ret = std::string{"(instance, 2),\n"};
+	const auto instance_name = rel_string_id(pred<instance>{});
+	auto ret = std::string{"(" + instance_name +", 2),\n"};
 	for (const auto& a: m_dynamic_relations) {
-		ret += ("(dynamic_relation_" + std::to_string(a.first) + ", " + std::to_string(a.second)+"),\n");
+		ret += ("(" + rel_string_id(a.first) + ", " + std::to_string(a.second)+"),\n");
 	}
 	ret.pop_back();
 	ret.pop_back();
@@ -55,10 +56,11 @@ std::string basic_problem::dyn_rel_list() const {
 }
 
 std::string basic_problem::dyn_axiom_list() const {
+	const auto instance_name = rel_string_id(pred<instance>{});
 	auto ret = std::string{};
 	for (const auto e : m_entities) {
 		if (e) {
-			ret += ("formula(instance(" + (*e).entity_id_name() + ", " + (*e).instance_of() +
+			ret += ("formula(" + instance_name + "(" + (*e).entity_id_name() + ", " + (*e).instance_of() +
 				")).\n");
 		}
 	}
@@ -66,7 +68,7 @@ std::string basic_problem::dyn_axiom_list() const {
 		if (a.empty()) {
 			continue;
 		}
-		ret += ("formula(dynamic_relation_" + std::to_string(a.front()) + "(");
+		ret += ("formula(" + rel_string_id(a.front()) + "(");
 		assert(a.size() >= 2);
 		ret += ("dynamic_object_" + std::to_string(a[1]));
 		for(auto i = std::size_t{2}; i < a.size(); ++i) {

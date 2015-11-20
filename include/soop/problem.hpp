@@ -16,19 +16,44 @@ using fun_ptr = F*;
 
 using int_lst = std::initializer_list<int>;
 
-template<typename...Args>
-std::string rel_string_id(fun_ptr<bool(Args...)> f) {
-	return "dynamic_relation_" + std::to_string(reinterpret_cast<std::size_t>(f));
+template<typename T>
+struct pred{};
+template<typename T>
+struct type {
+	static std::string entity_id_name() { return T::name(); }
+};
+
+
+
+template<typename Rel>
+std::size_t rel_id(pred<Rel>) {
+	return Rel::id();
 }
 
+template<typename...Args>
+std::size_t rel_id(fun_ptr<bool(Args...)> f) {
+	return reinterpret_cast<std::size_t>(f);
+}
+
+
+inline std::string rel_string_id(std::size_t address) {
+	return "relation_" + std::to_string(address);
+}
+
+template<typename...Args>
+std::string rel_string_id(fun_ptr<bool(Args...)> f) {
+	return rel_string_id(rel_id(f));
+}
+
+template<typename Rel>
+std::string rel_string_id(pred<Rel> rel) {
+	return rel_string_id(rel_id(rel));
+}
+
+
+
 template<typename Functions, typename Predicates, typename Axioms>
-struct problem {
-	template<typename...>
-	static constexpr bool false_fun() {return false;}
-	static_assert(false_fun<Functions, Predicates, Axioms>(),
-			"problem must receive `functions`, `predicates` and `formulae` as "
-			"template arguments.");
-};
+struct problem;
 
 class basic_problem;
 
@@ -54,13 +79,6 @@ private:
 	friend class basic_problem;
 };
 
-template<typename T>
-struct pred{};
-template<typename T>
-struct type {
-	static std::string entity_id_name() { return T::name(); }
-};
-
 class basic_problem {
 public:
 
@@ -76,22 +94,17 @@ public:
 		m_dynamic_relations.emplace(std::make_pair(id, sizeof...(Args)));
 		m_known_relations.emplace(std::make_pair(id, std::initializer_list<std::size_t>{}));
 	}
-	template<typename... FArgs, typename...Args>
-	void declare_satifies(const fun_ptr<bool(FArgs...)> rel, Args&&... args) {
-		static_assert(std::is_same<bool, decltype(rel(std::forward<Args>(args)...))>::value, "invalid arguments to relation");
+	template<typename Rel, typename...Args>
+	void declare_satifies(const Rel rel, Args&&... args) {
+		//static_assert(std::is_same<bool, decltype(rel(std::forward<Args>(args)...))>::value, "invalid arguments to relation");
 		const auto axiom_id = m_dynamic_axioms.size();
-		m_dynamic_axioms.push_back({reinterpret_cast<std::size_t>(rel), (args.id())...});
+		m_dynamic_axioms.push_back({rel_id(rel), (args.id())...});
 		(void) int_lst{ ((m_known_relations[args.id()].push_back(axiom_id)),0)... };
 	}
-	template<typename... FArgs, typename...Args>
-	bool request_satisfication(const fun_ptr<bool(FArgs...)> rel, Args&&... args) {
-		return request_satisfication(std::integral_constant<bool, has_free_var<Args...>()>{},
+	template<typename Rel, typename...Args>
+	bool request_satisfication(const Rel rel, Args&&... args) {
+		return request_satisfication_impl(std::integral_constant<bool, has_free_var<Args...>()>{},
 			rel_string_id(rel), std::forward<Args>(args)...);
-	}
-	template<typename Pred, typename...Args>
-	bool request_satisfication(pred<Pred>, Args&&... args) {
-		return request_satisfication(std::integral_constant<bool, has_free_var<Args...>()>{},
-			Pred::name(), std::forward<Args>(args)...);
 	}
 protected:
 	std::string dyn_fun_list() const;
@@ -99,11 +112,12 @@ protected:
 	std::string dyn_axiom_list() const;
 private:
 	template<typename... FArgs, typename...Args>
-	bool request_satisfication(std::false_type, const std::string& rel, Args&&... args) {
+	bool request_satisfication_impl(std::false_type, const std::string& rel, Args&&... args) {
+		std::cout << "rel = " << rel << '\n';
 		return request( "formula(" + rel + "(" + entity_join(args...) + ")).\n" );
 	}
 	template<typename... FArgs, typename...Args>
-	bool request_satisfication(std::true_type, const std::string& rel, Args&&... args) {
+	bool request_satisfication_impl(std::true_type, const std::string& rel, Args&&... args) {
 		return request( "formula(exists(" + get_var_list<Args...>::to_string() +", " + rel + "(" + entity_join(args...) + "))).\n" );
 	}
 	std::unordered_map<std::size_t, std::size_t> m_dynamic_relations;
@@ -140,7 +154,7 @@ struct problem<
 			+ dyn_fun_list() +
 			"].\n"
 			"predicates[\n"
-			+ predicates<Predicates...>::to_string() + ",\n"
+			+ predicates<predicate<instance>, Predicates...>::to_string() + ",\n"
 			+ dyn_rel_list() +
 			"].\n"
 			"end_of_list.\n"

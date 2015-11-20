@@ -50,6 +50,8 @@ struct and_ {
 };
 
 struct instance {
+	static std::size_t id() { return reinterpret_cast<std::size_t>(&id); }
+	static std::size_t rank() { return 2; }
 	static std::string name() { return "instance"; }
 };
 

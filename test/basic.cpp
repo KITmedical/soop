@@ -60,10 +60,6 @@ TEST_CASE("instances") {
 	CHECK(p.request(formula<less<v1, v4>>{}));
 	CHECK_FALSE(p.request(formula<less<v3, v2>>{}));
 
-	// Any string works:
-	CHECK(p.request("formula(instance("+i1.entity_id_name()+", "+v1::name()+"))."));
-
-	// But in general the typed version is preferable:
 	CHECK(p.request_satisfication(pred<instance>{}, i1, type<v1>{}));
 	CHECK(p.request_satisfication(pred<instance>{}, i2, type<v2>{}));
 
