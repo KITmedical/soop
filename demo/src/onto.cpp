@@ -16,8 +16,23 @@ soop::basic_problem& get_onto() {
 				make_function<std::unordered_map<e<std::size_t>, e<std::string>>>,
 				make_function<std::map<std::pair<e<std::size_t>, e<std::size_t>>, e<std::size_t>>>
 			>,
-			predicates<>,
-			formulae<>
+			predicates<
+				predicate<has_grade_t>,
+				predicate<deserves_price_t>
+			>,
+			formulae<
+				formula<
+					forall<set<var<'S'>, x,y,z>,
+						implies<and_<
+							has_grade<var<'S'>, x>,
+							has_grade<var<'S'>, y>,
+							has_grade<var<'S'>, z>
+							>,
+							deserves_price<var<'S'>>
+						>
+					>
+				>
+			>
 		> tmp;
 		tmp.add_relation(is_teacher);
 		tmp.add_relation(is_student);

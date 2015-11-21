@@ -5,6 +5,8 @@
 #include "definitions.hpp"
 #include "reader.hpp"
 #include "stats.hpp"
+#include "onto.hpp"
+
 
 int main(int argc, char** argv) try {
 	if (argc != 6) {
@@ -21,6 +23,8 @@ int main(int argc, char** argv) try {
 	for (auto t: teacher_success) {
 		std::cout << teacher_names->at(t.first) << ": " << t.second << '\n';
 	}
+	std::cout << "There exists a student that deserves a price: " << std::boolalpha
+		<< get_onto().request_satisfication(soop::pred<deserves_price_t>{}, soop::w{}) << '\n';
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';
 	return 2;

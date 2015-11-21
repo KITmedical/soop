@@ -16,6 +16,14 @@ bool is_student(const soop::e<std::size_t>&);
 bool is_subject(const soop::e<std::size_t>&);
 bool is_grade(const soop::e<std::size_t>&);
 
+template<typename T>
+struct deserves_price: soop::make_predicate_impl<deserves_price, 1, T> {};
+using deserves_price_t = deserves_price<void>;
+
+template<typename Stud, typename Subject>
+struct has_grade: soop::make_predicate_impl<has_grade, 2, Stud, Subject> {};
+using has_grade_t = has_grade<void, void>;
+
 #ifndef DO_NOT_ASSERT
 #define ONTO_ASSERT_SATISFICATION(...)\
 	do {if (not get_onto().request_satisfication(__VA_ARGS__)) {\
