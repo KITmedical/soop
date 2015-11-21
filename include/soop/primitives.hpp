@@ -105,6 +105,11 @@ struct or_ {
 };
 
 template <typename... Values>
+struct xor_ {
+	static std::string to_string() { return "xor(" + join<Values...>() + ")"; }
+};
+
+template <typename... Values>
 struct equal {
 	static std::string to_string() { return "equal(" + join<Values...>() + ")"; }
 };
@@ -205,8 +210,51 @@ struct make_function_impl {
 template<typename Self, std::size_t Rank = 0>
 using make_function = function<make_function_impl<Self, Rank>>;
 
-template<typename Self, std::size_t Rank = 1>
-using make_predicate = predicate<make_function_impl<Self, Rank>>;
+
+template<template<class...> class Self, std::size_t Rank = 0>
+struct make_predicate_impl_base {
+	static std::string name() {
+		return rel_string_id(id());
+	}
+	static std::size_t id() {
+		return reinterpret_cast<std::size_t>(&id);
+	}
+	static std::size_t rank() {
+		return Rank;
+	}
+	static std::type_index type_index() {
+		throw std::logic_error{"not yet implemented"};
+		//return std::type_index{typeid(Self)};
+	}
+	template<typename...Args>
+	static std::string to_string(const Args&... args) {
+		auto str = name() + "(";
+		if (sizeof...(Args)) {
+			(void) ignore{(str += (args.name() + ','),0)...};
+			str.pop_back();
+		}
+		str += ')';
+		return str;
+	}
+};
+template<template<class...> class Self, std::size_t Rank = 0, typename...Args>
+struct make_predicate_impl : make_predicate_impl_base<Self, Rank> {
+	using make_predicate_impl_base<Self, Rank>::name;
+	using make_predicate_impl_base<Self, Rank>::id;
+	using make_predicate_impl_base<Self, Rank>::rank;
+	using make_predicate_impl_base<Self, Rank>::to_string;
+	static std::string to_string() {
+		auto str = name() + "(";
+		if (sizeof...(Args)) {
+			(void) ignore{(str += (Args::to_string() + ','),0)...};
+			str.pop_back();
+		}
+		str += ')';
+		return str;
+	}
+};
+template<template<class...> class Self, std::size_t Rank = 1, typename...Args>
+using make_predicate = predicate<make_predicate_impl<Self, Rank, Args...>>;
 
 
 struct instance : public make_function_impl<instance, 2> {
