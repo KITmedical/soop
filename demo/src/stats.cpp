@@ -5,12 +5,15 @@
 #include <iterator>
 #include <unordered_map>
 
-
+template<typename Int>
+inline static double d_div(Int l, Int r) {
+	return static_cast<double>(l) / static_cast<double>(r);
+}
 
 std::vector<std::pair<teacher_id, double>> avg_success(const grade_map& grades,
                                                        const student_teacher_map& teachers) {
 	auto results = std::unordered_map<teacher_id, std::pair<std::size_t, std::size_t>>{};
-	for (const auto& g: *grades) {
+	for (const auto& g : *grades) {
 		const auto teacher_it = teachers->find(g.first);
 		if (teacher_it == teachers->end()) {
 			continue;
@@ -23,7 +26,8 @@ std::vector<std::pair<teacher_id, double>> avg_success(const grade_map& grades,
 		++pair.second;
 	}
 	auto ret = std::vector<std::pair<teacher_id, double>>{};
-	std::transform(results.begin(), results.end(), std::back_inserter(ret),
-		[](const auto& p) { return std::make_pair(p.first, p.second.first * 1.0 / p.second.second); });
+	std::transform(results.begin(), results.end(), std::back_inserter(ret), [](const auto& p) {
+		return std::make_pair(p.first, d_div(p.second.first, p.second.second));
+	});
 	return ret;
 }

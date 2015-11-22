@@ -39,7 +39,7 @@ template<char... Name> struct is_var<var<Name...>>: std::true_type{};
 template<typename... Ts>
 constexpr bool has_free_var() {
 	return any_of({is_var<Ts>::value...});
-};
+}
 
 template<typename...Vars>
 struct var_list{
