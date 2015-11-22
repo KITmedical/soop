@@ -21,7 +21,7 @@ using v4 = util_type<'v','4'>;
 bool test_pred1(const soop::e<v1>& l, const soop::e<v2>& r) {
 	assert(l.problem() == r.problem() and l.problem() != nullptr);
 	auto& p = *l.problem();
-	return p.request_satisfication(test_pred1, l, r);
+	return p.request_satisfaction(test_pred1, l, r);
 }
 
 bool test_pred2(const soop::e<v1>&, const soop::e<v2>&) { throw std::logic_error{""}; }
@@ -61,29 +61,29 @@ TEST_CASE("instances") {
 	CHECK(p.request(formula<less<v1, v4>>{}));
 	CHECK_FALSE(p.request(formula<less<v3, v2>>{}));
 
-	CHECK(p.request_satisfication(pred<instance>{}, i1, type<v1>{}));
-	CHECK(p.request_satisfication(pred<instance>{}, i2, type<v2>{}));
+	CHECK(p.request_satisfaction(pred<instance>{}, i1, type<v1>{}));
+	CHECK(p.request_satisfaction(pred<instance>{}, i2, type<v2>{}));
 
-	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i1, type<v2>{}));
-	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i2, type<v1>{}));
+	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i1, type<v2>{}));
+	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i2, type<v1>{}));
 
 	auto i3 = std::move(i1);
 
-	CHECK(p.request_satisfication(pred<instance>{}, i3, type<v1>{}));
-	CHECK_FALSE(p.request_satisfication(pred<instance>{}, i3, type<v2>{}));
+	CHECK(p.request_satisfaction(pred<instance>{}, i3, type<v1>{}));
+	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i3, type<v2>{}));
 
 	p.add_relation(test_pred1);
 	p.add_relation(test_pred2);
 
-	CHECK_FALSE(p.request_satisfication(test_pred1, i3, i2));
+	CHECK_FALSE(p.request_satisfaction(test_pred1, i3, i2));
 
 	p.declare_satifies(test_pred1, i3, i2);
 
-	CHECK(p.request_satisfication(test_pred1, i3, i2));
+	CHECK(p.request_satisfaction(test_pred1, i3, i2));
 
 	auto i4 = i3;
 
-	CHECK(p.request_satisfication(test_pred1, i4, i2));
+	CHECK(p.request_satisfaction(test_pred1, i4, i2));
 	CHECK(test_pred1(i4, i2));
 }
 

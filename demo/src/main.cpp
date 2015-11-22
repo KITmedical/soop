@@ -24,7 +24,7 @@ int main(int argc, char** argv) try {
 		std::cout << teacher_names->at(t.first) << ": " << t.second << '\n';
 	}
 	std::cout << "There exists a student that deserves a price: " << std::boolalpha
-		<< get_onto().request_satisfication(soop::pred<deserves_price_t>{}, soop::w{}) << '\n';
+		<< get_onto().request_satisfaction(soop::pred<deserves_price_t>{}, soop::w{}) << '\n';
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';
 	return 2;

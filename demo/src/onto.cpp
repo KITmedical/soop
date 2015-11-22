@@ -1,10 +1,10 @@
 
 #include "onto.hpp"
 
-bool is_teacher(const soop::e<std::size_t>& e) { return e.problem()->request_satisfication(is_teacher, e); }
-bool is_student(const soop::e<std::size_t>& e) { return e.problem()->request_satisfication(is_student, e); }
-bool is_subject(const soop::e<std::size_t>& e) { return e.problem()->request_satisfication(is_subject, e); }
-bool is_grade  (const soop::e<std::size_t>& e) { return e.problem()->request_satisfication(is_grade,   e); }
+bool is_teacher(const soop::e<std::size_t>& e) { return e.problem()->request_satisfaction(is_teacher, e); }
+bool is_student(const soop::e<std::size_t>& e) { return e.problem()->request_satisfaction(is_student, e); }
+bool is_subject(const soop::e<std::size_t>& e) { return e.problem()->request_satisfaction(is_subject, e); }
+bool is_grade  (const soop::e<std::size_t>& e) { return e.problem()->request_satisfaction(is_grade,   e); }
 
 soop::basic_problem& get_onto() {
 	using namespace soop;

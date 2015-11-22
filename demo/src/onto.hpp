@@ -26,12 +26,12 @@ struct has_grade: soop::make_predicate_impl<has_grade, 2, Stud, Subject> {};
 using has_grade_t = has_grade<void, void>;
 
 #ifndef DO_NOT_ASSERT
-#define ONTO_ASSERT_SATISFICATION(...)\
-	do {if (not get_onto().request_satisfication(__VA_ARGS__)) {\
+#define ONTO_ASSERT_SATISFACTION(...)\
+	do {if (not get_onto().request_satisfaction(__VA_ARGS__)) {\
 		throw std::logic_error{"unsatisfied requirement"};\
 	}} while(false)
 #else
-#define ONTO_ASSERT_SATISFICATION(...)\
+#define ONTO_ASSERT_SATISFACTION(...)\
 	do {} while(false)
 #endif
 #endif

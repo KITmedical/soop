@@ -18,9 +18,9 @@ std::vector<std::pair<teacher_id, double>> avg_success(const grade_map& grades,
 		if (teacher_it == teachers->end()) {
 			continue;
 		}
-		ONTO_ASSERT_SATISFICATION(is_teacher, teacher_it->second);
-		ONTO_ASSERT_SATISFICATION(is_grade, g.second);
-		// ONTO_ASSERT_SATISFICATION(is_student, g.second); // This should fire!
+		ONTO_ASSERT_SATISFACTION(is_teacher, teacher_it->second);
+		ONTO_ASSERT_SATISFACTION(is_grade, g.second);
+		// ONTO_ASSERT_SATISFACTION(is_student, g.second); // This should fire!
 		auto& pair = results[teacher_it->second];
 		pair.first += *g.second;
 		++pair.second;

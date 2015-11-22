@@ -63,8 +63,8 @@ public:
 		(void) ignore{ ((m_known_relations[args.id()].push_back(axiom_id)),0)... };
 	}
 	template<typename Rel, typename...Args>
-	bool request_satisfication(const Rel rel, Args&&... args) {
-		return request_satisfication_impl(std::integral_constant<bool, has_free_var<Args...>()>{},
+	bool request_satisfaction(const Rel rel, Args&&... args) {
+		return request_satisfaction_impl(std::integral_constant<bool, has_free_var<Args...>()>{},
 			rel_string_id(rel), std::forward<Args>(args)...);
 	}
 	std::string get_name_of(std::type_index index) const { return m_type_names.at(index); }
@@ -76,11 +76,11 @@ protected:
 	std::unordered_map<std::type_index, std::string> m_type_names;
 private:
 	template<typename... FArgs, typename...Args>
-	bool request_satisfication_impl(std::false_type, const std::string& rel, Args&&... args) {
+	bool request_satisfaction_impl(std::false_type, const std::string& rel, Args&&... args) {
 		return request( "formula(" + rel + "(" + entity_join(args...) + ")).\n" );
 	}
 	template<typename... FArgs, typename...Args>
-	bool request_satisfication_impl(std::true_type, const std::string& rel, Args&&... args) {
+	bool request_satisfaction_impl(std::true_type, const std::string& rel, Args&&... args) {
 		return request( "formula(exists(" + get_var_list<Args...>::to_string() +", " + rel + "(" + entity_join(args...) + "))).\n" );
 	}
 	std::unordered_map<std::size_t, std::size_t> m_dynamic_relations;
