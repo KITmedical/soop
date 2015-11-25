@@ -74,6 +74,7 @@ protected:
 	std::string dyn_axiom_list() const;
 
 	std::unordered_map<std::type_index, std::string> m_type_names;
+	std::unordered_map<std::size_t, std::string> m_rel_names = {{equal_id(), "equal"}};
 private:
 	template<typename... FArgs, typename...Args>
 	bool request_satisfaction_impl(std::false_type, const std::string& rel, Args&&... args) {

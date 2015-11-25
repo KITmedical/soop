@@ -109,11 +109,6 @@ struct xor_ {
 	static std::string to_string() { return "xor(" + join<Values...>() + ")"; }
 };
 
-template <typename... Values>
-struct equal {
-	static std::string to_string() { return "equal(" + join<Values...>() + ")"; }
-};
-
 template <typename Value>
 struct not_ {
 	static std::string to_string() { return "not(" + Value::to_string() + ")"; }
@@ -258,6 +253,33 @@ using make_predicate = predicate<make_predicate_impl<Self, Rank, Args...>>;
 
 
 struct instance : public make_function_impl<instance, 2> {
+};
+
+inline std::size_t equal_id() {
+	return reinterpret_cast<std::size_t>(equal_id);
+}
+struct equal_t {
+	static std::string name() {
+		return "equal";
+	}
+	static std::size_t id() {
+		return equal_id();
+	}
+	static std::size_t rank() {
+		return 2;
+	}
+	template<typename Lhs, typename Rhs>
+	static std::string to_string(const Lhs& l, const Rhs& r) {
+		return "equal(" + l.to_string() + ", " + r.to_string() + ")";
+	}
+};
+template<typename L, typename R>
+struct equal: equal_t{
+	using equal_t::to_string;
+	template<typename Lhs, typename Rhs>
+	static std::string to_string(const Lhs& l, const Rhs& r) {
+		return "equal(" + l.to_string() + ", " + r.to_string() + ")";
+	}
 };
 
 } // namespace soop

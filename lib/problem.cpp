@@ -68,7 +68,12 @@ std::string basic_problem::dyn_axiom_list() const {
 		if (a.empty()) {
 			continue;
 		}
-		ret += ("formula(" + rel_string_id(a.front()) + "(");
+		auto it = m_rel_names.find(a.front());
+		if (it == m_rel_names.end()) {
+			ret += ("formula(" + rel_string_id(a.front()) + "(");
+		} else {
+			ret += ("formula(" + it->second + "(");
+		}
 		assert(a.size() >= 2);
 		ret += ("dynamic_object_" + std::to_string(a[1]));
 		for(auto i = std::size_t{2}; i < a.size(); ++i) {

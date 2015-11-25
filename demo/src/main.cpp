@@ -18,6 +18,9 @@ int main(int argc, char** argv) try {
 	auto subject_names = read_subject_names(argv[3]);
 	auto grades   = read_grade_map(argv[4]);
 	auto teachers = read_teacher_map(argv[5]);
+	for (auto& g: *grades) {
+		get_onto().declare_satifies(soop::pred<soop::equal_t>{}, g.first.first, student_names->find(g.first.first)->first);
+	}
 
 	const auto teacher_success = avg_success(grades, teachers);
 	for (auto t: teacher_success) {
@@ -25,6 +28,9 @@ int main(int argc, char** argv) try {
 	}
 	std::cout << "There exists a student that deserves a price: " << std::boolalpha
 		<< get_onto().request_satisfaction(soop::pred<deserves_price_t>{}, soop::w{}) << '\n';
+	for(auto& stud: *student_names) {
+		std::cout << *stud.second << ": " << get_onto().request_satisfaction(soop::pred<deserves_price_t>{}, stud.first) << '\n';
+	}
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';
 	return 2;
