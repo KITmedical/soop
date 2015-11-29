@@ -19,6 +19,9 @@ public:
 	entity(entity&&) noexcept;
 	entity& operator=(entity&&) noexcept;
 
+	// These COULD be added in the current
+	// model by adding the axuiom equal(o, *this),
+	// but it is very unclear, whether this is desireable
 	entity(const entity&) = delete;
 	entity& operator=(const entity&) = delete;
 
