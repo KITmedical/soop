@@ -1,32 +1,47 @@
 
 #include "soop/entity.hpp"
+#include "soop/onto.hpp"
 
 
 namespace soop {
 
-entity::entity(ontology& o):
-	m_ontology{&o}
-{
-	// TODO
-}
-entity::entity(std::nullptr_t):
-	m_ontology{nullptr},
-	m_id{}
-{
-	// TODO
-}
+// The problem with implementing it that
+// way is that we don't know the exact type
+// yet because RTTI doesn't work till all
+// ctors have run:
+//entity::entity(ontology& o){
+	//o.add_entity(*this);
+//}
+entity::entity(std::nullptr_t){}
 
-entity::entity(entity&& o) noexcept {
-	// TODO
+entity::entity(entity&& o) noexcept:
+	m_ontology{o.m_ontology},
+	m_id{o.m_id}
+{
+	o.m_ontology = nullptr;
+	if (m_ontology) {
+		m_ontology->reseat_entity(m_id, *this);
+	}
 }
 
 entity& entity::operator=(entity&& o) noexcept {
-	// TODO
+	if (m_ontology) {
+		m_ontology->delete_entity(m_id);
+	}
+	m_ontology = o.m_ontology;
+	o.m_ontology = nullptr;
+	m_id = o.m_id;
+
+	if (m_ontology) {
+		m_ontology->reseat_entity(m_id, *this);
+	}
 	return *this;
 }
 
 entity::~entity() {
-	// TODO
+	if (m_ontology) {
+		m_ontology->delete_entity(m_id);
+	}
 }
 
 

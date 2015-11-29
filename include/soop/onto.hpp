@@ -27,10 +27,13 @@ public:
 	void delete_axiom(std::size_t index);
 
 	std::size_t add_entity(entity& e);
+	void delete_entity(std::size_t id);
 
 	template <typename T>
 	void add_type();
 	bool request(const std::string& conjecture) const;
+
+	void reseat_entity(std::size_t id, const entity& e);
 
 private:
 	std::string types() const;

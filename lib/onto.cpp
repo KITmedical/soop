@@ -35,6 +35,13 @@ std::size_t ontology::add_entity(entity& e) {
 	return id;
 }
 
+void ontology::delete_entity(std::size_t id) {
+	for(auto& a: m_entities.at(id).second) {
+		m_axioms.at(a) = "";
+	}
+	m_entities.at(id) = {};
+}
+
 bool ontology::request(const std::string& conjecture) const {
 	auto types = this->types();
 	const auto entities = this->entities();
@@ -76,7 +83,12 @@ bool ontology::request(const std::string& conjecture) const {
 	return try_proof(problem);
 }
 
+void ontology::reseat_entity(std::size_t id, const entity& e) {
+	m_entities.at(id).first = &e;
+}
+
 std::string ontology::types() const {
+	// TODO: deleted entities
 	return it_transform_join(m_known_types.begin(), m_known_types.end(),
 			[](const std::string& t) {
 			return "(" + t +", 0)";
@@ -91,6 +103,7 @@ std::string ontology::entities() const {
 }
 
 std::string ontology::predicates() const {
+	// TODO: deleted predicates
 	return it_transform_join(m_names.begin(), m_names.end(),
 			[](const auto& p) {
 			return p.second;

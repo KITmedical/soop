@@ -11,7 +11,9 @@ class ontology;
 
 class entity {
 public:
-	entity(ontology& o);
+	// At some point I want this to work:
+	entity(ontology& o) = delete;
+
 	entity(std::nullptr_t);
 
 	entity(entity&&) noexcept;
@@ -27,16 +29,16 @@ public:
 
 private:
 	friend class ontology;
-	ontology* m_ontology;
-	std::size_t m_id;
+	ontology* m_ontology = nullptr;
+	std::size_t m_id = 0;
 };
 
 template <typename T>
 class e : public entity {
 public:
 	template <typename... Args>
-	e(ontology& o, Args&&... args)
-	        : entity{o}, m_value{std::forward<Args>(args)...} {}
+	e(ontology& o, Args&&... args) = delete;
+	//        : entity{o}, m_value{std::forward<Args>(args)...} {}
 	template <typename... Args>
 	e(std::nullptr_t, Args&&... args)
 	        : entity{nullptr}, m_value{std::forward<Args>(args)...} {}
