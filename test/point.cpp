@@ -1,4 +1,5 @@
 
+#if 0
 #include "soop/problem.hpp"
 
 #include <catch.hpp>
@@ -53,3 +54,4 @@ TEST_CASE("point-checks") {
 	CHECK_FALSE(prob.request_satisfaction(is_coordpair, v{}, v{}));
 	CHECK(prob.request_satisfaction(is_coordpair, v{}, w{}));
 }
+#endif

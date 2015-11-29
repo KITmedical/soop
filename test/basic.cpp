@@ -1,4 +1,6 @@
-#include "soop/problem.hpp"
+
+#if 0
+#include "soop/onto.hpp"
 
 #include <cassert>
 #include <utility>
@@ -10,7 +12,6 @@ struct util_type {
 	static std::string name() { return std::string{Name...}; }
 	static std::string to_string() { return name(); }
 	static std::size_t rank() { return 0; }
-	static std::type_index type_index() { return std::type_index{typeid(util_type<Name...>)}; }
 };
 
 using v1 = util_type<'v','1'>;
@@ -87,3 +88,4 @@ TEST_CASE("instances") {
 	CHECK(test_pred1(i4, i2));
 }
 
+#endif

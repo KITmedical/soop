@@ -6,6 +6,7 @@
 #include <string>
 
 #include "entity.hpp"
+#include "util.hpp"
 
 namespace soop {
 
@@ -34,8 +35,8 @@ public:
 	constexpr static std::size_t rank() { return Rank; }
 
 private:
-	static const std::string& to_string(const std::string& s) {return s;}
-	static std::string to_string(const entity& e) {return e.name();}
+	static const std::string& to_string(const std::string& s) { return s; }
+	static std::string to_string(const entity& e) { return e.name(); }
 	std::size_t m_id;
 	std::string m_name;
 };
@@ -49,7 +50,7 @@ private:
 	};                                                                                         \
 	}                                                                                          \
 	namespace preds {                                                                          \
-	const auto Identifier = binder<(Rank)>{predicate_definitions::Identifier{}};               \
+	const auto Identifier = ::soop::binder<(Rank)>{predicate_definitions::Identifier{}};       \
 	}
 
 #define SOOP_MAKE_PREDICATE(Identifier, Rank)                                                      \

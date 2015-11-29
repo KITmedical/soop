@@ -20,7 +20,7 @@ public:
 	entity(const entity&) = delete;
 	entity& operator=(const entity&) = delete;
 
-	~entity();
+	virtual ~entity();
 
 	std::string name() const { return "o_" + std::to_string(m_id); }
 	std::size_t id() const { return m_id; }
