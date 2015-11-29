@@ -18,6 +18,11 @@ SOOP_MAKE_RENAMED_PREDICATE(or_, "or", 2)
 SOOP_MAKE_RENAMED_PREDICATE(and_, "and", 2)
 SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
 
+namespace preds {
+std::string exists(std::initializer_list<const char*> vars, const std::string& p);
+std::string forall(std::initializer_list<const char*> vars, const std::string& p);
+}
+
 class ontology {
 public:
 	template <typename... Ps>

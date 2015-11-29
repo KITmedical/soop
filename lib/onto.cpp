@@ -6,6 +6,17 @@
 
 namespace soop {
 
+namespace preds {
+std::string exists(std::initializer_list<const char*> vars, const std::string& p) {
+	return "exists([" + it_transform_join(vars.begin(), vars.end(), [](const auto& v){return v;}, ", ")
+		+ "], " + p + ")";
+}
+std::string forall(std::initializer_list<const char*> vars, const std::string& p) {
+	return "forall([" + it_transform_join(vars.begin(), vars.end(), [](const auto& v){return v;}, ", ")
+		+ "], " + p + ")";
+}
+} // namespace preds
+
 std::size_t ontology::add_axiom(std::string axiom) {
 	m_axioms.emplace_back(std::move(axiom));
 	return m_axioms.size() - 1u;
