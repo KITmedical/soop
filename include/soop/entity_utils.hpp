@@ -2,7 +2,7 @@
 #ifndef SOOP_ENTITY_UTILS_HPP
 #define SOOP_ENTITY_UTILS_HPP
 
-#include "problem.hpp"
+#include "entity.hpp"
 
 namespace std {
 
@@ -16,28 +16,28 @@ struct hash<soop::e<T>> {
 } // namespace std
 
 namespace soop {
-	template<typename T>
-	bool operator==(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator==(const e<L>& l, const e<R>& r) {
 		return *l == *r;
 	}
-	template<typename T>
-	bool operator!=(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator!=(const e<L>& l, const e<R>& r) {
 		return *l != *r;
 	}
-	template<typename T>
-	bool operator<(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator<(const e<L>& l, const e<R>& r) {
 		return *l <  *r;
 	}
-	template<typename T>
-	bool operator>(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator>(const e<L>& l, const e<R>& r) {
 		return *l >  *r;
 	}
-	template<typename T>
-	bool operator<=(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator<=(const e<L>& l, const e<R>& r) {
 		return *l <= *r;
 	}
-	template<typename T>
-	bool operator>=(const e<T>& l, const e<T>& r) {
+	template<typename L, typename R>
+	bool operator>=(const e<L>& l, const e<R>& r) {
 		return *l >= *r;
 	}
 

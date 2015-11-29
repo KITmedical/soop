@@ -16,11 +16,11 @@ file(GLOB test_code    "test/*.cpp")
 
 add_library(soop ${lib_headers} ${lib_code})
 
-add_executable(soop_demo ${demo_code} ${demo_headers})
-target_link_libraries(soop_demo soop)
+#add_executable(soop_demo ${demo_code} ${demo_headers})
+#target_link_libraries(soop_demo soop)
 
-add_executable(soop_test ${test_code})
-target_link_libraries(soop_test soop)
-add_test(NAME soop-test COMMAND soop_test)
-enable_testing(true)
+#add_executable(soop_test ${test_code})
+#target_link_libraries(soop_test soop)
+#add_test(NAME soop-test COMMAND soop_test)
+#enable_testing(true)
 
