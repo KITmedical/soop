@@ -60,6 +60,7 @@ TEST_CASE("complex axioms") {
 
 	CHECK(o.request(sp::equal(e2, e3)));
 	CHECK(o.request(p::testpred(e1, e4)));
+	CHECK(o.request(sp::exists({"x"}, sp::and_(p::testpred(e1, "x"), p::testpred("x", e4)))));
 	// Not yet working because we also need to narrow down y to e<int>'s:
 	//CHECK(o.request(sp::exists({"x"}, sp::forall({"y"}, p::testpred("x", "y")))));
 }
