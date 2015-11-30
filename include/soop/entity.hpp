@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <string>
+#include <typeinfo>
 
 namespace soop {
 
@@ -11,8 +12,7 @@ class ontology;
 
 class entity {
 public:
-	// At some point I want this to work:
-	entity(ontology& o) = delete;
+	entity(ontology& o, const std::type_info& t);
 
 	entity(std::nullptr_t);
 
@@ -40,8 +40,8 @@ template <typename T>
 class e : public entity {
 public:
 	template <typename... Args>
-	e(ontology& o, Args&&... args) = delete;
-	//        : entity{o}, m_value{std::forward<Args>(args)...} {}
+	e(ontology& o, Args&&... args)
+	        : entity{o, typeid(*this)}, m_value{std::forward<Args>(args)...} {}
 	template <typename... Args>
 	e(std::nullptr_t, Args&&... args)
 	        : entity{nullptr}, m_value{std::forward<Args>(args)...} {}

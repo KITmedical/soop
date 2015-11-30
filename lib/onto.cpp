@@ -27,8 +27,11 @@ void ontology::delete_axiom(std::size_t index) {
 }
 
 std::size_t ontology::add_entity(entity& e) {
+	return add_entity(e, typeid(e));
+}
+std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 	assert(e.m_ontology == nullptr);
-	const auto type_name = std::string{typeid(e).name()};
+	const auto type_name = std::string{type.name()};
 	assert(m_known_types.count(type_name));
 	// If increasing the vectors throws, we would like
 	// this to happen before we changed state:

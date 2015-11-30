@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
 #include "predicates.hpp"
 #include "entity.hpp"
 
@@ -32,6 +31,8 @@ public:
 	void delete_axiom(std::size_t index);
 
 	std::size_t add_entity(entity& e);
+	std::size_t add_entity(entity& e, const std::type_info&);
+
 	void delete_entity(std::size_t id);
 
 	template <typename T>

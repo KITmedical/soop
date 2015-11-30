@@ -1,5 +1,6 @@
 
 #include "soop/entity.hpp"
+
 #include "soop/onto.hpp"
 
 
@@ -9,9 +10,9 @@ namespace soop {
 // way is that we don't know the exact type
 // yet because RTTI doesn't work till all
 // ctors have run:
-//entity::entity(ontology& o){
-	//o.add_entity(*this);
-//}
+entity::entity(ontology& o, const std::type_info& t){
+	o.add_entity(*this, t);
+}
 entity::entity(std::nullptr_t){}
 
 entity::entity(entity&& o) noexcept:
