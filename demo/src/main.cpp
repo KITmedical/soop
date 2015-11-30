@@ -19,17 +19,17 @@ int main(int argc, char** argv) try {
 	auto grades   = read_grade_map(argv[4]);
 	auto teachers = read_teacher_map(argv[5]);
 	for (auto& g: *grades) {
-		get_onto().declare_satifies(soop::pred<soop::equal_t>{}, g.first.first, student_names->find(g.first.first)->first);
+		get_onto().add_axiom(soop::preds::equal(g.first.first, student_names->find(g.first.first)->first));
 	}
 
 	const auto teacher_success = avg_success(grades, teachers);
-	for (auto t: teacher_success) {
-		std::cout << teacher_names->at(t.first) << ": " << t.second << '\n';
+	for (const auto& t: teacher_success) {
+		std::cout << teacher_names->at({nullptr, t.first}) << ": " << t.second << '\n';
 	}
 	std::cout << "There exists a student that deserves a price: " << std::boolalpha
-		<< get_onto().request_satisfaction(soop::pred<deserves_price_t>{}, soop::w{}) << '\n';
+		<< get_onto().request(soop::preds::exists({"X"}, preds::deserves_price("X"))) << '\n';
 	for(auto& stud: *student_names) {
-		std::cout << *stud.second << ": " << get_onto().request_satisfaction(soop::pred<deserves_price_t>{}, stud.first) << '\n';
+		std::cout << *stud.second << ": " << get_onto().request(preds::deserves_price(stud.first)) << '\n';
 	}
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';

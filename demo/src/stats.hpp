@@ -7,7 +7,7 @@
 
 #include "definitions.hpp"
 
-std::vector<std::pair<teacher_id, double>> avg_success(const grade_map& grades,
+std::vector<std::pair<std::size_t, double>> avg_success(const grade_map& grades,
                                                        const student_teacher_map& teachers);
 
 #endif

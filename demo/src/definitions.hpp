@@ -9,7 +9,7 @@
 #include <utility>
 #include <map>
 
-#include "soop/problem.hpp"
+#include "soop/entity.hpp"
 #include "onto.hpp"
 
 // Use one datatype for everything to

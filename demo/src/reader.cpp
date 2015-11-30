@@ -45,10 +45,11 @@ static std::map<std::pair<soop::e<std::size_t>, soop::e<std::size_t>>, soop::e<s
 }
 
 
+
 student_name_map read_student_names(const std::string& filename) {
 	auto map = read_name_map(filename);
 	for(auto& p: map) {
-		get_onto().declare_satifies(is_student, p.first);
+		get_onto().add_axiom(preds::is_student(p.first));
 	}
 	return {get_onto(), std::move(map)};
 }
@@ -56,7 +57,7 @@ student_name_map read_student_names(const std::string& filename) {
 teacher_name_map read_teacher_names(const std::string& filename) {
 	auto map = read_name_map(filename);
 	for(auto& p: map) {
-		get_onto().declare_satifies(is_teacher, p.first);
+		get_onto().add_axiom(preds::is_teacher(p.first));
 	}
 	return {get_onto(), std::move(map)};
 }
@@ -64,7 +65,7 @@ teacher_name_map read_teacher_names(const std::string& filename) {
 subject_name_map read_subject_names(const std::string& filename) {
 	auto map = read_name_map(filename);
 	for(auto& p: map) {
-		get_onto().declare_satifies(is_subject, p.first);
+		get_onto().add_axiom(preds::is_subject(p.first));
 	}
 	return {get_onto(), std::move(map)};
 }
@@ -72,10 +73,10 @@ subject_name_map read_subject_names(const std::string& filename) {
 grade_map read_grade_map(const std::string& filename) {
 	auto map = read_tuple_map(filename);
 	for(auto& p: map) {
-		get_onto().declare_satifies(is_student, p.first.first);
-		get_onto().declare_satifies(is_subject, p.first.second);
-		get_onto().declare_satifies(is_grade, p.second);
-		get_onto().declare_satifies(soop::pred<has_grade_t>{}, p.first.first, p.second);
+		get_onto().add_axiom(preds::is_student(p.first.first));
+		get_onto().add_axiom(preds::is_subject(p.first.second));
+		get_onto().add_axiom(preds::is_grade(p.second));
+		get_onto().add_axiom(preds::has_grade(p.first.first, p.second));
 	}
 	return {get_onto(), std::move(map)};
 }
@@ -83,9 +84,9 @@ grade_map read_grade_map(const std::string& filename) {
 student_teacher_map read_teacher_map(const std::string& filename) {
 	auto map = read_tuple_map(filename);
 	for(auto& p: map) {
-		get_onto().declare_satifies(is_student, p.first.first);
-		get_onto().declare_satifies(is_subject, p.first.second);
-		get_onto().declare_satifies(is_teacher, p.second);
+		get_onto().add_axiom(preds::is_student(p.first.first));
+		get_onto().add_axiom(preds::is_subject(p.first.second));
+		get_onto().add_axiom(preds::is_teacher(p.second));
 	}
 	return {get_onto(), std::move(map)};
 }
