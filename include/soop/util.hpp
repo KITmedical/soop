@@ -18,16 +18,21 @@ std::string join(std::string head, const Tail&... tail) {
 	return head;
 }
 
-template <typename It, typename F>
-std::string it_transform_join(It b, It e, F f, const std::string& del = ",\n") {
-	if (b == e) {
+template <typename It, typename F, typename T>
+std::string it_transform_join(It it, It e, F f, T t, const std::string& del = ",\n") {
+	while (it != e and not f(*it)) {
+		++it;
+	}
+	if (it == e) {
 		return "";
 	}
-	std::string ret = f(*b);
-	++b;
-	for (; b != e; ++b) {
-		ret += del;
-		ret += f(*b);
+	std::string ret = t(*it);
+	++it;
+	for (; it != e; ++it) {
+		if (f(*it)) {
+			ret += del;
+			ret += t(*it);
+		}
 	}
 	return ret;
 }

@@ -8,11 +8,25 @@ namespace soop {
 
 namespace preds {
 std::string exists(std::initializer_list<const char*> vars, const std::string& p) {
-	return "exists([" + it_transform_join(vars.begin(), vars.end(), [](const auto& v){return v;}, ", ")
+	return "exists([" 
+		+ it_transform_join(
+			vars.begin(),
+			vars.end(),
+			[](const auto&){return true;},
+			[](const auto& v){return v;},
+			", "
+		)
 		+ "], " + p + ")";
 }
 std::string forall(std::initializer_list<const char*> vars, const std::string& p) {
-	return "forall([" + it_transform_join(vars.begin(), vars.end(), [](const auto& v){return v;}, ", ")
+	return "forall(["
+		+ it_transform_join(
+			vars.begin(),
+			vars.end(),
+			[](const auto&){return true;},
+			[](const auto& v){return v;},
+			", "
+		)
 		+ "], " + p + ")";
 }
 } // namespace preds
@@ -104,6 +118,7 @@ void ontology::reseat_entity(std::size_t id, const entity& e) {
 std::string ontology::types() const {
 	// TODO: deleted entities
 	return it_transform_join(m_known_types.begin(), m_known_types.end(),
+			[](const std::string& s) {return not s.empty();},
 			[](const std::string& t) {
 			return "(" + t +", 0)";
 			});
@@ -111,6 +126,7 @@ std::string ontology::types() const {
 
 std::string ontology::entities() const {
 	return it_transform_join(m_entities.begin(), m_entities.end(),
+			[](const auto& e) {return e.first != nullptr;},
 			[](const auto& e) {
 			return "(" + e.first->name() +", 0)";
 			});
@@ -119,6 +135,7 @@ std::string ontology::entities() const {
 std::string ontology::predicates() const {
 	// TODO: deleted predicates
 	return it_transform_join(m_names.begin(), m_names.end(),
+			[](const auto&){return true;},
 			[](const auto& p) {
 			return p.second;
 			});
