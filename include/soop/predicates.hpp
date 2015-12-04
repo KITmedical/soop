@@ -19,6 +19,11 @@ auto name(F f) -> decltype(f.name()) {
 	return f.name();
 }
 
+template<typename T>
+std::string t_name() {
+	return typeid(T).name();
+}
+
 template <std::size_t Rank>
 class binder {
 public:
