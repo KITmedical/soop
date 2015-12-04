@@ -1,11 +1,11 @@
 
-#if 0
-#include "soop/onto.hpp"
-
 #include <cassert>
 #include <utility>
 
 #include <catch.hpp>
+
+#include "soop/onto.hpp"
+#include "soop/predicates.hpp"
 
 template<char...Name>
 struct util_type {
@@ -19,73 +19,59 @@ using v2 = util_type<'v','2'>;
 using v3 = util_type<'v','3'>;
 using v4 = util_type<'v','4'>;
 
-bool test_pred1(const soop::e<v1>& l, const soop::e<v2>& r) {
-	assert(l.problem() == r.problem() and l.problem() != nullptr);
-	auto& p = *l.problem();
-	return p.request_satisfaction(test_pred1, l, r);
-}
+SOOP_MAKE_PREDICATE(test_pred1, 2)
+SOOP_MAKE_PREDICATE(test_pred2, 2)
+SOOP_MAKE_PREDICATE(less, 2)
 
 bool test_pred2(const soop::e<v1>&, const soop::e<v2>&) { throw std::logic_error{""}; }
 
-// centralized definitions are simple:
-template<template<typename, typename> class T>
-struct transitive {
-	static std::string to_string() {
-		const auto name = T<soop::x,soop::y>::name();
-		return "forall([x,y,z], implies(and("+name+"(x,y), "+name+"(y, z)),"+name+"(x,z)))";
-	}
+inline std::string transitive(const std::string& name) {
+	return "forall([x,y,z], implies(and("+name+"(x,y), "+name+"(y, z)),"+name+"(x,z)))";
 };
 
 
 TEST_CASE("instances") {
-	using namespace soop;
-	problem<
-		functions<
-			function<v1>,
-			function<v2>,
-			function<v3>,
-			function<v4>
-		>,
-		predicates<
-			predicate<less<x,y>>
-		>,
-		formulae<
-			formula<less<v1, v2>>,
-			formula<less<v2, v3>>,
-			formula<less<v3, v4>>,
-			formula<transitive<less>>
-		>
-	> p;
+	soop::ontology o{
+		::preds::test_pred1,
+		::preds::test_pred2,
+		::preds::less
+	};
+	o.add_type<soop::e<v1>>();
+	o.add_type<soop::e<v2>>();
+	o.add_type<soop::e<v3>>();
+	o.add_type<soop::e<v4>>();
+	using soop::e;
+	o.add_axiom(::preds::less(soop::t_name<e<v1>>(), soop::t_name<e<v2>>()));
+	o.add_axiom(::preds::less(soop::t_name<e<v2>>(), soop::t_name<e<v3>>()));
+	o.add_axiom(::preds::less(soop::t_name<e<v3>>(), soop::t_name<e<v4>>()));
+	o.add_axiom(::transitive(preds::less.name()));
 
-	e<v1> i1{p};
-	e<v2> i2{p};
-	CHECK(p.request(formula<less<v1, v4>>{}));
-	CHECK_FALSE(p.request(formula<less<v3, v2>>{}));
+	using namespace ::preds;
+	using namespace ::soop::preds;
 
-	CHECK(p.request_satisfaction(pred<instance>{}, i1, type<v1>{}));
-	CHECK(p.request_satisfaction(pred<instance>{}, i2, type<v2>{}));
+	soop::e<v1> i1{o};
+	soop::e<v2> i2{o};
+	CHECK(o.request(less(soop::t_name<e<v1>>(), soop::t_name<e<v4>>())));
+	CHECK_FALSE(o.request(less(soop::t_name<e<v3>>(), soop::t_name<e<v2>>())));
 
-	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i1, type<v2>{}));
-	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i2, type<v1>{}));
+	CHECK(o.request(instance_of(i1, soop::t_name<e<v1>>())));
+	CHECK(o.request(instance_of(i2, soop::t_name<e<v2>>())));
+
+	CHECK_FALSE(o.request(instance_of(i1, soop::t_name<e<v2>>())));
+	CHECK_FALSE(o.request(instance_of(i2, soop::t_name<e<v1>>())));
 
 	auto i3 = std::move(i1);
 
-	CHECK(p.request_satisfaction(pred<instance>{}, i3, type<v1>{}));
-	CHECK_FALSE(p.request_satisfaction(pred<instance>{}, i3, type<v2>{}));
+	CHECK(o.request(instance_of(i3, soop::t_name<e<v1>>())));
+	CHECK_FALSE(o.request(instance_of(i3, soop::t_name<e<v2>>())));
 
-	p.add_relation(test_pred1);
-	p.add_relation(test_pred2);
+	CHECK_FALSE(o.request(test_pred1(i3, i2)));
 
-	CHECK_FALSE(p.request_satisfaction(test_pred1, i3, i2));
+	o.add_axiom(test_pred1(i3, i2));
 
-	p.declare_satifies(test_pred1, i3, i2);
+	CHECK(o.request(test_pred1(i3, i2)));
 
-	CHECK(p.request_satisfaction(test_pred1, i3, i2));
-
-	auto i4 = i3;
-
-	CHECK(p.request_satisfaction(test_pred1, i4, i2));
-	CHECK(test_pred1(i4, i2));
+	// auto i4 = i3;
+	//CHECK(o.request(test_pred1(i4, i2)));
 }
 
-#endif
