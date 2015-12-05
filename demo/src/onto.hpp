@@ -17,6 +17,11 @@ SOOP_MAKE_PREDICATE(is_student, 1)
 SOOP_MAKE_PREDICATE(is_subject, 1)
 SOOP_MAKE_PREDICATE(is_grade, 1)
 
+SOOP_MAKE_PREDICATE(very_good_grade, 1)
+SOOP_MAKE_PREDICATE(good_grade, 1)
+SOOP_MAKE_PREDICATE(passing_grade, 1)
+
+
 SOOP_MAKE_PREDICATE(deserves_price, 1)
 SOOP_MAKE_PREDICATE(has_grade, 2)
 

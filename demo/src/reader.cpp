@@ -75,7 +75,20 @@ grade_map read_grade_map(const std::string& filename) {
 	for(auto& p: map) {
 		get_onto().add_axiom(preds::is_student(p.first.first));
 		get_onto().add_axiom(preds::is_subject(p.first.second));
-		get_onto().add_axiom(preds::is_grade(p.second));
+		switch (*p.second) {
+			case 1:
+				get_onto().add_axiom(preds::very_good_grade(p.second));
+				break;
+			case 2:
+				get_onto().add_axiom(preds::good_grade(p.second));
+				break;
+			case 3: case 4:
+				get_onto().add_axiom(preds::passing_grade(p.second));
+				break;
+			default:
+				get_onto().add_axiom(preds::is_grade(p.second));
+				break;
+		}
 		get_onto().add_axiom(preds::has_grade(p.first.first, p.second));
 	}
 	return {get_onto(), std::move(map)};
