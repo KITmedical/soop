@@ -41,6 +41,8 @@ public:
 
 	void reseat_entity(std::size_t id, const entity& e);
 
+	template<typename P>
+	std::size_t add_predicate(const P& p);
 private:
 	std::string types() const;
 	std::string entities() const;
@@ -58,9 +60,10 @@ private:
 /////////////////////////////////////////////////////////////
 
 template <typename... Ps>
-ontology::ontology(const Ps&... predicates)
-        : m_names{{preds::instance_of.id(), preds::instance_of.name()},
-                  {predicates.id(), predicates.name()}...} {}
+ontology::ontology(const Ps&... predicates) {
+	add_predicate(preds::instance_of);
+	(void) std::initializer_list<std::size_t>{add_predicate(predicates)...};
+}
 
 template <typename T>
 void ontology::add_type() {
@@ -70,6 +73,12 @@ void ontology::add_type() {
 		throw std::invalid_argument{"type already known"};
 	}
 	m_known_types.insert(std::move(name));
+}
+
+template<typename P>
+std::size_t ontology::add_predicate(const P& p) {
+	m_names[p.id()] = p.name();
+	return p.id();
 }
 
 } // namespace soop
