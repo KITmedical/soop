@@ -31,6 +31,10 @@ std::string forall(std::initializer_list<const char*> vars, const std::string& p
 }
 } // namespace preds
 
+ontology::ontology() {
+	add_predicate(preds::instance_of);
+}
+
 std::size_t ontology::add_axiom(std::string axiom) {
 	m_axioms.emplace_back(std::move(axiom));
 	return m_axioms.size() - 1u;

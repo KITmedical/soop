@@ -24,6 +24,19 @@ std::string t_name() {
 	return typeid(T).name();
 }
 
+template<typename...Arguments>
+class argument_pack {
+};
+
+template<typename Predicate, typename... Arguments>
+class predicate {
+public:
+	using free_variables = argument_pack<>;
+	std::string to_string(const free_variables& assignments) const;
+private:
+	std::tuple<Arguments...> m_arguments;
+};
+
 template <std::size_t Rank>
 class binder {
 public:

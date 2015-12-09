@@ -22,10 +22,27 @@ std::string exists(std::initializer_list<const char*> vars, const std::string& p
 std::string forall(std::initializer_list<const char*> vars, const std::string& p);
 }
 
+template<typename... Types>
+struct type_list{};
+
+template<typename... Preds>
+class pred_list_t{
+public:
+	pred_list_t(Preds... preds): values{std::move(preds)...} {}
+	std::tuple<Preds...> values;
+};
+template<typename... Preds>
+pred_list_t<Preds...> pred_list(Preds... preds) {
+	return {std::move(preds)...};
+}
+
+using axiom_list = std::initializer_list<std::string>;
+
 class ontology {
 public:
-	template <typename... Ps>
-	ontology(const Ps&... predicates);
+	ontology();
+	template <typename... Ts, typename... Ps>
+	ontology(type_list<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as = {});
 
 	std::size_t add_axiom(std::string axiom);
 	void delete_axiom(std::size_t index);
@@ -59,10 +76,14 @@ private:
 //             Implementation of templates
 /////////////////////////////////////////////////////////////
 
-template <typename... Ps>
-ontology::ontology(const Ps&... predicates) {
+template <typename... Ts, typename... Ps>
+ontology::ontology(type_list<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as):
+	m_axioms{as}
+{
+	using ignore = std::initializer_list<int>;
+	(void) ignore{ (add_type<Ts>(),0)... };
 	add_predicate(preds::instance_of);
-	(void) std::initializer_list<std::size_t>{add_predicate(predicates)...};
+	explode_tuple([&](const auto& p){add_predicate(p);}, ps.values);
 }
 
 template <typename T>

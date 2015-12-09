@@ -3,22 +3,27 @@
 
 soop::ontology& get_onto() {
 	static auto p = []{
-		soop::ontology onto{
-			::preds::has_grade,
-			::preds::deserves_price,
-			::preds::is_teacher,
-			::preds::is_student,
-			::preds::is_subject,
-			::preds::is_grade,
-			::preds::passing_grade,
-			::preds::good_grade,
-			::preds::very_good_grade
-		};
 		using soop::e;
-		onto.add_type<e<std::size_t>>();
-		onto.add_type<e<std::string>>();
-		onto.add_type<e<std::unordered_map<e<std::size_t>, e<std::string>>>>();
-		onto.add_type<e<std::map<std::pair<e<std::size_t>, e<std::size_t>>, e<std::size_t>>>>();
+		soop::ontology onto{
+			soop::type_list<
+				e<std::size_t>,
+				e<std::string>,
+				e<std::unordered_map<e<std::size_t>, e<std::string>>>,
+				e<std::map<std::pair<e<std::size_t>, e<std::size_t>>, e<std::size_t>>>
+
+			>{},
+			soop::pred_list(
+				::preds::has_grade,
+				::preds::deserves_price,
+				::preds::is_teacher,
+				::preds::is_student,
+				::preds::is_subject,
+				::preds::is_grade,
+				::preds::passing_grade,
+				::preds::good_grade,
+				::preds::very_good_grade
+			)
+		};
 		using namespace soop::preds;
 		using namespace ::preds;
 		onto.add_axiom(forall({"g"}, implies(very_good_grade("g"), good_grade("g"))));

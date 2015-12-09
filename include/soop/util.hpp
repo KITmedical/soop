@@ -2,7 +2,10 @@
 #ifndef SOOP_UTIL_HPP
 #define SOOP_UTIL_HPP
 
+#include <initializer_list>
 #include <string>
+#include <tuple>
+#include <utility>
 
 namespace soop {
 
@@ -35,6 +38,19 @@ std::string it_transform_join(It it, It e, F f, T t, const std::string& del = ",
 		}
 	}
 	return ret;
+}
+
+namespace impl {
+template<typename Fun, typename...Ts, std::size_t...Is>
+void explode_tuple(Fun f, const std::tuple<Ts...>& t, std::index_sequence<Is...>) {
+	using ignore = std::initializer_list<int>;
+	(void) ignore{ (f(std::get<Is>(t)), 0)... };
+}
+} // namespace impl
+
+template<typename Fun, typename...Ts>
+void explode_tuple(Fun f, const std::tuple<Ts...>& t) {
+	return impl::explode_tuple(f, t, std::make_index_sequence<sizeof...(Ts)>{});
 }
 
 } // namespace soop

@@ -4,15 +4,15 @@
 
 #include "soop/onto.hpp"
 
-TEST_CASE("creation") { soop::ontology o{}; }
+TEST_CASE("creation") { soop::ontology o{soop::type_list<>{}, soop::pred_list()}; }
 
 TEST_CASE("adding types") {
-	soop::ontology o{};
+	soop::ontology o{soop::type_list<>{}, soop::pred_list()};
 	REQUIRE_NOTHROW(o.add_type<soop::e<int>>());
 }
 
 TEST_CASE("adding values") {
-	soop::ontology o{};
+	soop::ontology o{soop::type_list<>{}, soop::pred_list()};
 	o.add_type<soop::e<int>>();
 	soop::e<int> e{nullptr, 2};
 	REQUIRE_NOTHROW(o.add_entity(e));
@@ -22,7 +22,7 @@ SOOP_MAKE_PREDICATE(testpred, 2)
 namespace p = preds;
 
 TEST_CASE("simple axioms") {
-	soop::ontology o{p::testpred};
+	soop::ontology o{soop::type_list<>{}, soop::pred_list(p::testpred)};
 	o.add_type<soop::e<int>>();
 	soop::e<int> e1{nullptr, 2};
 	soop::e<int> e2{nullptr, 2};
@@ -37,7 +37,7 @@ SOOP_MAKE_PREDICATE(transitive, 1)
 TEST_CASE("complex axioms") {
 	using namespace soop::preds;
 	const auto tp = preds::testpred;
-	soop::ontology o{tp};
+	soop::ontology o{soop::type_list<>{}, soop::pred_list(tp)};
 	o.add_axiom(
 	        forall({"x", "y", "z"}, implies(and_(tp("x", "y"), tp("y", "z")), tp("x", "z"))));
 	o.add_axiom(forall({"x"}, tp("x", "x")));
