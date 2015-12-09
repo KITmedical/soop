@@ -23,7 +23,9 @@ std::string forall(std::initializer_list<const char*> vars, const std::string& p
 }
 
 template<typename... Types>
-struct type_list{};
+struct type_list_t{};
+template<typename... Types>
+type_list_t<Types...> type_list;
 
 template<typename... Preds>
 class pred_list_t{
@@ -42,7 +44,7 @@ class ontology {
 public:
 	ontology();
 	template <typename... Ts, typename... Ps>
-	ontology(type_list<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as = {});
+	ontology(type_list_t<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as = {});
 
 	std::size_t add_axiom(std::string axiom);
 	void delete_axiom(std::size_t index);
@@ -77,7 +79,7 @@ private:
 /////////////////////////////////////////////////////////////
 
 template <typename... Ts, typename... Ps>
-ontology::ontology(type_list<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as):
+ontology::ontology(type_list_t<Ts...>, const pred_list_t<Ps...>& ps, axiom_list as):
 	m_axioms{as}
 {
 	using ignore = std::initializer_list<int>;

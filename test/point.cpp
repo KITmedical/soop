@@ -32,7 +32,7 @@ struct point {
 
 TEST_CASE("point-checks") {
 	soop::ontology onto{
-		soop::type_list<>{},
+		soop::type_list<>,
 		soop::pred_list(preds::is_x_coord, preds::is_y_coord, preds::is_coordpair)
 	};
 	onto.add_type<soop::e<int>>();

@@ -10,8 +10,7 @@ soop::ontology& get_onto() {
 				e<std::string>,
 				e<std::unordered_map<e<std::size_t>, e<std::string>>>,
 				e<std::map<std::pair<e<std::size_t>, e<std::size_t>>, e<std::size_t>>>
-
-			>{},
+			>,
 			soop::pred_list(
 				::preds::has_grade,
 				::preds::deserves_price,

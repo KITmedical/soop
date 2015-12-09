@@ -32,7 +32,7 @@ inline std::string transitive(const std::string& name) {
 
 TEST_CASE("instances") {
 	soop::ontology o{
-		soop::type_list<>{},
+		soop::type_list<>,
 		soop::pred_list(
 		::preds::test_pred1,
 		::preds::test_pred2,
