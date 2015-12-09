@@ -59,3 +59,17 @@ TEST_CASE("complex axioms") {
 	// Not yet working because we also need to narrow down y to e<int>'s:
 	// CHECK(o.request(sp::exists({"x"}, sp::forall({"y"}, tp("x", "y")))));
 }
+
+SOOP_MAKE_TYPECHECKED_PREDICATE(int_pred, 1, soop::e<int>)
+
+TEST_CASE("typechecked predicate") {
+	const auto& int_pred = ::preds::int_pred;
+	soop::ontology o{
+		soop::type_list<soop::e<int>>,
+		soop::pred_list(int_pred)
+	};
+	soop::e<int> i{o, 23};
+	o.add_axiom(int_pred(i));
+	//o.add_axiom(int_pred(3)); // correctly fires static assert
+	CHECK(o.request(int_pred(i)));
+}
