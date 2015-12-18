@@ -32,11 +32,12 @@ std::string forall(std::initializer_list<const char*> vars, const std::string& p
 } // namespace preds
 
 ontology::ontology() {
-	add_predicate(preds::instance_of);
+	//add_predicate(preds::instance_of);
 }
 
-std::size_t ontology::add_axiom(std::string axiom) {
-	m_axioms.emplace_back(std::move(axiom));
+std::size_t ontology::add_axiom(const formula& axiom) {
+	//m_axioms.emplace_back(std::move(axiom));
+	(void) axiom; // TODO
 	return m_axioms.size() - 1u;
 }
 
@@ -60,10 +61,10 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 
 	e.m_ontology = this;
 	e.m_id = id;
-	auto axiom = preds::instance_of(e, type_name);
-	const auto axiom_id = m_axioms.size();
-	m_entities.push_back({&e, {axiom_id}});
-	m_axioms.push_back(std::move(axiom));
+	//auto axiom = preds::instance_of(e, type_name);
+	//const auto axiom_id = m_axioms.size();
+	//m_entities.push_back({&e, {axiom_id}});
+	//m_axioms.push_back(std::move(axiom));
 	return id;
 }
 
@@ -74,7 +75,7 @@ void ontology::delete_entity(std::size_t id) {
 	m_entities.at(id) = {};
 }
 
-bool ontology::request(const std::string& conjecture) const {
+bool ontology::request(const formula& conjecture) const {
 	auto types = this->types();
 	const auto entities = this->entities();
 	const auto predicates = this->predicates();
@@ -108,7 +109,7 @@ bool ontology::request(const std::string& conjecture) const {
 		"end_of_list.\n"
 
 		"list_of_formulae(conjectures).\n"
-		"formula(" + conjecture + ").\n"
+		"formula(" + conjecture.to_string() + ").\n"
 		"end_of_list.\n"
 
 		"end_problem.\n\n";

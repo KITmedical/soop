@@ -26,8 +26,9 @@ int main(int argc, char** argv) try {
 	for (const auto& t: teacher_success) {
 		std::cout << teacher_names->at({nullptr, t.first}) << ": " << t.second << '\n';
 	}
+	soop::variable<'x'> x;
 	std::cout << "There exists a student that deserves a price: " << std::boolalpha
-		<< get_onto().request(soop::preds::exists({"X"}, preds::deserves_price("X"))) << '\n';
+		<< get_onto().request(soop::preds::exists({x}, preds::deserves_price(x))) << '\n';
 	for(auto& stud: *student_names) {
 		std::cout << *stud.second << ": " << get_onto().request(preds::deserves_price(stud.first)) << '\n';
 	}
