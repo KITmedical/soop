@@ -21,7 +21,7 @@ namespace preds {
 //////////////////////////// forall
 
 template <typename Pred>
-struct forall_t {
+struct forall_t : is_predicate {
 	forall_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
 	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
 		collect_entity(ids, next_index, pred);
@@ -43,7 +43,7 @@ auto forall(bound_vars vars, Pred p) {
 //////////////////////////// exists
 
 template <typename Pred>
-struct exists_t {
+struct exists_t : is_predicate{
 	exists_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
 	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
 		collect_entity(ids, next_index, pred);
@@ -96,17 +96,23 @@ public:
 	void reseat_entity(std::size_t id, const entity& e);
 
 	template<template<typename...>class P>
-	std::size_t add_predicate();
+	void add_predicate();
 private:
 	std::string types() const;
 	std::string entities() const;
 	std::string predicates() const;
 	std::string axioms() const;
 
-	std::unordered_map<std::size_t, std::string> m_names;
+	struct hash_first {
+		std::size_t operator()(const std::pair<std::string, std::size_t>& p) const {
+			return std::hash<std::string>{}(p.first);
+		}
+	};
+
 	std::vector<formula> m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;
 	std::unordered_set<std::string> m_known_types;
+	std::unordered_set<std::pair<std::string, std::size_t>, hash_first> m_predicate_names;
 };
 
 /////////////////////////////////////////////////////////////
@@ -134,10 +140,9 @@ void ontology::add_type() {
 }
 
 template<template<typename...>class P>
-std::size_t ontology::add_predicate() {
-	//m_names[p.id()] = p.name();
-	//return p.id();
-	return 0;
+void ontology::add_predicate() {
+	using Pred = P<get_meta_information>;
+	m_predicate_names.insert(std::make_pair(Pred::name(), Pred::rank()));
 }
 
 } // namespace soop

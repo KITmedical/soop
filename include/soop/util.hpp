@@ -2,6 +2,7 @@
 #ifndef SOOP_UTIL_HPP
 #define SOOP_UTIL_HPP
 
+#include <iostream>
 #include <algorithm>
 #include <initializer_list>
 #include <string>
@@ -31,7 +32,7 @@ std::string it_transform_join(It begin, It e, F f, T t, const std::string& del =
 		return "";
 	}
 	auto ret = std::string{t(*it)};
-	for (it = std::find_if(it, e, f); it != e; it = std::find_if(it, e, f)) {
+	for (it = std::find_if(it, e, f); it != e; it = std::find_if(std::next(it), e, f)) {
 		ret += del;
 		ret += t(*it);
 	}

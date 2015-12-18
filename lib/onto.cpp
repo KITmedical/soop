@@ -35,9 +35,9 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 
 	e.m_ontology = this;
 	e.m_id = id;
-	//auto axiom = preds::instance_of(e, type_name);
-	//const auto axiom_id = m_axioms.size();
-	//m_entities.push_back({&e, {axiom_id}});
+	const auto axiom_id = m_axioms.size();
+	m_entities.push_back({&e, {axiom_id}});
+	///auto axiom = formula{preds::instance_of(e, type_name)};
 	//m_axioms.push_back(std::move(axiom));
 	return id;
 }
@@ -95,7 +95,6 @@ void ontology::reseat_entity(std::size_t id, const entity& e) {
 }
 
 std::string ontology::types() const {
-	// TODO: deleted entities
 	return it_transform_join(m_known_types.begin(), m_known_types.end(),
 			[](const std::string& s) {return not s.empty();},
 			[](const std::string& t) {
@@ -113,10 +112,10 @@ std::string ontology::entities() const {
 
 std::string ontology::predicates() const {
 	// TODO: deleted predicates
-	return it_transform_join(m_names.begin(), m_names.end(),
+	return it_transform_join(m_predicate_names.begin(), m_predicate_names.end(),
 			[](const auto&){return true;},
 			[](const auto& p) {
-			return p.second;
+			return "(" + p.first + ", " + std::to_string(p.second) + ")";
 			});
 }
 
