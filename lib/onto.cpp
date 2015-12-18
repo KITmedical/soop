@@ -6,38 +6,12 @@
 
 namespace soop {
 
-namespace preds {
-std::string exists(std::initializer_list<const char*> vars, const std::string& p) {
-	return "exists([" 
-		+ it_transform_join(
-			vars.begin(),
-			vars.end(),
-			[](const auto&){return true;},
-			[](const auto& v){return v;},
-			", "
-		)
-		+ "], " + p + ")";
-}
-std::string forall(std::initializer_list<const char*> vars, const std::string& p) {
-	return "forall(["
-		+ it_transform_join(
-			vars.begin(),
-			vars.end(),
-			[](const auto&){return true;},
-			[](const auto& v){return v;},
-			", "
-		)
-		+ "], " + p + ")";
-}
-} // namespace preds
-
 ontology::ontology() {
 	//add_predicate(preds::instance_of);
 }
 
-std::size_t ontology::add_axiom(const formula& axiom) {
-	//m_axioms.emplace_back(std::move(axiom));
-	(void) axiom; // TODO
+std::size_t ontology::add_axiom(formula axiom) {
+	m_axioms.emplace_back(std::move(axiom));
 	return m_axioms.size() - 1u;
 }
 
@@ -70,7 +44,7 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 
 void ontology::delete_entity(std::size_t id) {
 	for(auto& a: m_entities.at(id).second) {
-		m_axioms.at(a) = "";
+		m_axioms.at(a) = {};
 	}
 	m_entities.at(id) = {};
 }
@@ -149,11 +123,11 @@ std::string ontology::predicates() const {
 std::string ontology::axioms() const {
 	auto ret = std::string{};
 	for (const auto& axiom : m_axioms) {
-		if (axiom.empty()) {
+		if (not axiom) {
 			continue;
 		}
 		ret += "formula(";
-		ret += axiom;
+		ret += axiom.to_string();
 		ret += ").\n";
 	}
 	return ret;

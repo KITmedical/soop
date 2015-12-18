@@ -17,6 +17,7 @@ namespace soop {
 
 class formula {
 public:
+	formula() = default;
 	template <typename P>
 	formula(P p) {
 		auto index = std::size_t{};
@@ -37,6 +38,8 @@ public:
 		m_formula->stream(stream, args);
 		return stream.str();
 	}
+
+	explicit operator bool() const {return m_formula != nullptr;}
 
 private:
 	class basic_formula {

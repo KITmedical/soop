@@ -73,7 +73,7 @@ template<template<typename...>class... Preds>
 class pred_list{
 };
 
-using axiom_list = std::initializer_list<std::string>;
+using axiom_list = std::vector<formula>;
 
 class ontology {
 public:
@@ -81,7 +81,7 @@ public:
 	template <typename... Ts, template<typename...>class... Ps>
 	ontology(type_list_t<Ts...>, pred_list<Ps...> ps, axiom_list as = {});
 
-	std::size_t add_axiom(const formula& axiom);
+	std::size_t add_axiom(formula axiom);
 	void delete_axiom(std::size_t index);
 
 	std::size_t add_entity(entity& e);
@@ -104,7 +104,7 @@ private:
 	std::string axioms() const;
 
 	std::unordered_map<std::size_t, std::string> m_names;
-	std::vector<std::string> m_axioms;
+	std::vector<formula> m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;
 	std::unordered_set<std::string> m_known_types;
 };
@@ -115,13 +115,12 @@ private:
 
 template <typename... Ts, template<typename...>class ... Ps>
 ontology::ontology(type_list_t<Ts...>, pred_list<Ps...>, axiom_list as):
-	m_axioms{as}
+	m_axioms(std::move(as))
 {
 	using ignore = std::initializer_list<int>;
 	(void) ignore{ (add_type<Ts>(),0)... };
+	add_predicate<preds::instance_of_t>();
 	(void) ignore{ (add_predicate<Ps>(),0)... };
-	//add_predicate<preds::instance_of>();
-	//explode_tuple([&](const auto& p){add_predicate(p);}, ps.values);
 }
 
 template <typename T>
