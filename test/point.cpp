@@ -33,7 +33,7 @@ struct point {
 TEST_CASE("point-checks") {
 	soop::ontology onto{
 		soop::type_list<>,
-		soop::pred_list(preds::is_x_coord, preds::is_y_coord, preds::is_coordpair)
+		soop::pred_list<preds::is_x_coord_t, preds::is_y_coord_t, preds::is_coordpair_t>()
 	};
 	onto.add_type<soop::e<int>>();
 	point p1{onto, 23, 42};
@@ -48,11 +48,14 @@ TEST_CASE("point-checks") {
 
 	CHECK_THROWS_AS((point{onto, std::move(x1), std::move(x2)}), std::runtime_error);
 
+	soop::variable<'x'> x;
+	soop::variable<'y'> y;
+
 	CHECK(onto.request(preds::is_coordpair(p1.x, p1.y)));
-	CHECK(onto.request(soop::preds::exists({"y"}, preds::is_coordpair(p1.x, "y"))));
-	CHECK_FALSE(onto.request(soop::preds::exists({"x"}, preds::is_coordpair("x", p1.x))));
-	CHECK_FALSE(onto.request(soop::preds::exists({"x"}, preds::is_coordpair("x", "x"))));
-	CHECK(onto.request(soop::preds::exists({"x", "y"}, preds::is_coordpair("x", "y"))));
+	CHECK(onto.request(soop::preds::exists({y}, preds::is_coordpair(p1.x, y))));
+	CHECK_FALSE(onto.request(soop::preds::exists({x}, preds::is_coordpair(x, p1.x))));
+	CHECK_FALSE(onto.request(soop::preds::exists({x}, preds::is_coordpair(x, x))));
+	CHECK(onto.request(soop::preds::exists({x, y}, preds::is_coordpair(x, y))));
 
 	// disabled because copy-ctors are currently not working, because implications would be unclear
 	//auto x = p1.x;

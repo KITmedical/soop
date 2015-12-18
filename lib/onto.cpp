@@ -35,18 +35,19 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 
 	e.m_ontology = this;
 	e.m_id = id;
-	const auto axiom_id = m_axioms.size();
-	m_entities.push_back({&e, {axiom_id}});
+	m_entities.push_back({&e, {}});
+	//m_entities.push_back({&e, {axiom_id}});
 	///auto axiom = formula{preds::instance_of(e, type_name)};
 	//m_axioms.push_back(std::move(axiom));
 	return id;
 }
 
 void ontology::delete_entity(std::size_t id) {
-	for(auto& a: m_entities.at(id).second) {
+	auto& data = m_entities.at(id);
+	for(auto& a: data.second) {
 		m_axioms.at(a) = {};
 	}
-	m_entities.at(id) = {};
+	data = {};
 }
 
 bool ontology::request(const formula& conjecture) const {
