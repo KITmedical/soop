@@ -39,7 +39,7 @@ public:
 		return stream.str();
 	}
 
-	explicit operator bool() const {return m_formula != nullptr;}
+	explicit operator bool() const { return m_formula != nullptr; }
 
 private:
 	class basic_formula {
@@ -74,6 +74,15 @@ struct bound_entity {
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
 
+template <typename T>
+struct bound_type {
+	void stream(std::ostream& out, const std::vector<std::string>&) const {
+		out << typeid(T).name();
+	}
+};
+template<typename T>
+static auto type = bound_type<T>{};
+
 template <char... Name>
 struct variable {
 	static std::string str() { return {Name...}; }
@@ -81,11 +90,12 @@ struct variable {
 };
 
 template <typename T>
-using to_bound_type = typename std::conditional<std::is_base_of<entity, T>{}, bound_entity,
-                                                std::remove_const_t<T>>::type;
+using to_bound_type =
+        std::conditional_t<std::is_base_of<entity, T>{}, bound_entity, std::remove_const_t<T>>;
 
 ///////////////// adding entities
-inline void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v) {
+inline void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index,
+                           bound_entity& v) {
 	ids.push_back(v.id);
 	v.id = next_index;
 	++next_index;
@@ -93,6 +103,9 @@ inline void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_inde
 
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
+
+template <typename T>
+void collect_entity(std::vector<std::size_t>&, std::size_t&, bound_type<T>) {}
 
 struct is_predicate {};
 constexpr void require_predicate(const is_predicate&) {}
@@ -181,7 +194,9 @@ struct get_meta_information {};
 	namespace preds {                                                                          \
 	template <typename... Args>                                                                \
 	struct Identifier##_t : ::soop::basic_predicate<Identifier##_t, Args...> {                 \
-		Identifier##_t(Args... args) : ::soop::impl::base_basic_predicate_t<Identifier##_t>{std::move(args)...} {}              \
+		Identifier##_t(Args... args)                                                       \
+		        : ::soop::impl::base_basic_predicate_t<Identifier##_t>{                    \
+		                  std::move(args)...} {}                                           \
 		static std::string name() { return Name; }                                         \
 		constexpr static std::size_t rank() { return (Rank); }                             \
 		static_assert(sizeof...(Args) == (Rank),                                           \
