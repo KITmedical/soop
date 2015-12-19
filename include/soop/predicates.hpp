@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iterator>
 #include <iostream>
+#include <typeindex>
 
 #include "entity.hpp"
 #include "type_checking.hpp"
@@ -83,6 +84,16 @@ struct bound_type {
 template<typename T>
 static auto type = bound_type<T>{};
 
+class dyn_type {
+public:
+	dyn_type(const std::type_info& info): m_type{info} {}
+	void stream(std::ostream& out, const std::vector<std::string>&) const {
+		out << m_type.name();
+	}
+private:
+	std::type_index m_type;
+};
+
 template <char... Name>
 struct variable {
 	static std::string str() { return {Name...}; }
@@ -106,6 +117,8 @@ void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) 
 
 template <typename T>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, bound_type<T>) {}
+
+inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const dyn_type&) {}
 
 struct is_predicate {};
 constexpr void require_predicate(const is_predicate&) {}

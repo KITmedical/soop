@@ -46,8 +46,6 @@ TEST_CASE("instances") {
 	CHECK(o.request(less(soop::type<e<v1>>, soop::type<e<v4>>)));
 	CHECK_FALSE(o.request(less(soop::type<e<v3>>, soop::type<e<v2>>)));
 
-	//TODO make instance_of work again:
-#if 0
 	CHECK(o.request(instance_of(i1, soop::type<e<v1>>)));
 	CHECK(o.request(instance_of(i2, soop::type<e<v2>>)));
 
@@ -67,7 +65,6 @@ TEST_CASE("instances") {
 
 	// auto i4 = i3;
 	//CHECK(o.request(test_pred1(i4, i2)));
-#endif
 }
 
 
