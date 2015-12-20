@@ -81,15 +81,16 @@ struct bound_type {
 		out << typeid(T).name();
 	}
 };
-template<typename T>
+template <typename T>
 static auto type = bound_type<T>{};
 
 class dyn_type {
 public:
-	dyn_type(const std::type_info& info): m_type{info} {}
+	dyn_type(const std::type_info& info) : m_type{info} {}
 	void stream(std::ostream& out, const std::vector<std::string>&) const {
 		out << m_type.name();
 	}
+
 private:
 	std::type_index m_type;
 };
@@ -223,6 +224,8 @@ struct get_meta_information {};
                                                                                                    \
 	template <typename... Args>                                                                \
 	auto Identifier(const Args&... args) {                                                     \
+		::soop::impl::require_valid_types(::soop::impl::actual_types_list<Args...>{},      \
+		                                  ::soop::allowed_types_list<__VA_ARGS__>{});      \
 		return ::soop::make_pred<Identifier##_t>(args...);                                 \
 	}                                                                                          \
 	}

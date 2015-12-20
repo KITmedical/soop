@@ -67,11 +67,12 @@ SOOP_MAKE_TYPECHECKED_PREDICATE(int_pred, 1, soop::e<int>)
 
 TEST_CASE("typechecked predicate") {
 	soop::ontology o{
-		soop::type_list<soop::e<int>>,
+		soop::type_list<soop::e<int>, soop::e<double>>,
 		soop::pred_list<preds::int_pred_t>()
 	};
 	soop::e<int> i{o, 23};
 	o.add_axiom(preds::int_pred(i));
-	//o.add_axiom(int_pred(3)); // correctly fires static assert
 	CHECK(o.request(preds::int_pred(i)));
+	soop::e<double> d{o, 2.7};
+	//o.add_axiom(int_pred(d)); // correctly fires static assert
 }
