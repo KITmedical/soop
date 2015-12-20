@@ -25,12 +25,6 @@ public:
 		p.collect_entities(m_args, index);
 		m_formula = std::make_unique<concrete_formula<P>>(std::move(p));
 	}
-	void print_arg_ids() const {
-		std::copy(m_args.begin(), m_args.end(),
-		          std::ostream_iterator<std::size_t>{std::cout, ", "});
-		std::cout << '\n';
-	}
-
 	std::string to_string() const {
 		std::ostringstream stream;
 		std::vector<std::string> args;
