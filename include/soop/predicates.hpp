@@ -19,20 +19,11 @@ namespace soop {
 class formula {
 public:
 	formula() = default;
+
 	template <typename P>
-	formula(P p) {
-		auto index = std::size_t{};
-		p.collect_entities(m_args, index);
-		m_formula = std::make_unique<concrete_formula<P>>(std::move(p));
-	}
-	std::string to_string() const {
-		std::ostringstream stream;
-		std::vector<std::string> args;
-		std::transform(m_args.begin(), m_args.end(), std::back_inserter(args),
-		               [](auto id) { return "o_" + std::to_string(id); });
-		m_formula->stream(stream, args);
-		return stream.str();
-	}
+	formula(P p);
+
+	std::string to_string() const;
 
 	explicit operator bool() const { return m_formula != nullptr; }
 
@@ -46,34 +37,26 @@ private:
 	class concrete_formula : public basic_formula {
 	public:
 		concrete_formula(P p) : m_pred{std::move(p)} {}
-		void stream(std::ostream& s,
-		            const std::vector<std::string>& args) const final override {
-			m_pred.stream(s, args);
-		}
 
+		void stream(std::ostream& s,
+		            const std::vector<std::string>& args) const final override;
 	private:
 		P m_pred;
 	};
 
 	std::unique_ptr<basic_formula> m_formula;
-
-public:
 	std::vector<std::size_t> m_args;
 };
 
 struct bound_entity {
 	bound_entity(const entity& e) : id{e.id()} {}
-	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << names.at(id);
-	}
+	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
 
 template <typename T>
 struct bound_type {
-	void stream(std::ostream& out, const std::vector<std::string>&) const {
-		out << typeid(T).name();
-	}
+	void stream(std::ostream& out, const std::vector<std::string>&) const;
 };
 template <typename T>
 static auto type = bound_type<T>{};
@@ -81,9 +64,7 @@ static auto type = bound_type<T>{};
 class dyn_type {
 public:
 	dyn_type(const std::type_info& info) : m_type{info} {}
-	void stream(std::ostream& out, const std::vector<std::string>&) const {
-		out << m_type.name();
-	}
+	void stream(std::ostream& out, const std::vector<std::string>&) const;
 
 private:
 	std::type_index m_type;
@@ -100,12 +81,8 @@ using to_bound_type =
         std::conditional_t<std::is_base_of<entity, T>{}, bound_entity, std::remove_const_t<T>>;
 
 ///////////////// adding entities
-inline void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index,
-                           bound_entity& v) {
-	ids.push_back(v.id);
-	v.id = next_index;
-	++next_index;
-}
+void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index,
+                           bound_entity& v);
 
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
@@ -120,40 +97,23 @@ constexpr void require_predicate(const is_predicate&) {}
 
 template <typename T>
 auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
-        -> decltype(require_predicate(pred)) {
-	pred.collect_entities(ids, next_index);
-}
+        -> decltype(require_predicate(pred));
 
 template <typename... Ts>
 void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
-                      std::tuple<Ts...>& args) {
-	tuple_foreach(args, [&](auto& arg) { collect_entity(ids, next_index, arg); });
-}
+                      std::tuple<Ts...>& args);
 
 ///////////////// streaming entities
 template <typename... Args>
 void stream(std::ostream& s, const std::vector<std::string>& args, const std::string& name,
-            const std::tuple<Args...>& tuple) {
-	s << name << '(';
-	indexed_tuple_foreach(tuple, [&](const auto& arg, std::size_t index) {
-		if (index) {
-			s << ", ";
-		}
-		arg.stream(s, args);
-	});
-	s << ')';
-}
+            const std::tuple<Args...>& tuple);
 
 template <template <typename...> class Self, typename... Args>
 struct basic_predicate : is_predicate {
 	basic_predicate(Args... args) : args{std::move(args)...} {}
 	using self = Self<Args...>;
-	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
-		soop::collect_entities(ids, next_index, args);
-	}
-	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		soop::stream(out, names, self::name(), args);
-	}
+	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index);
+	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 	std::tuple<Args...> args;
 };
 
@@ -165,17 +125,7 @@ auto make_pred(const Args&... args) {
 class bound_vars {
 public:
 	template <typename... Args>
-	bound_vars(Args... args) {
-		static_assert(sizeof...(Args) > 0, "");
-		m_str = "[";
-		indexed_tuple_foreach(std::tie(args...), [&](const auto& arg, std::size_t i) {
-			if (i) {
-				m_str += ", ";
-			}
-			m_str += arg.str();
-		});
-		m_str += ']';
-	}
+	bound_vars(Args... args);
 	const std::string& str() const { return m_str; }
 
 private:
@@ -234,6 +184,72 @@ struct get_meta_information {};
 /////////////////////////////////////////////////////////////
 //             Implementation of templates
 /////////////////////////////////////////////////////////////
+
+template <typename P>
+formula::formula(P p) {
+	auto index = std::size_t{};
+	p.collect_entities(m_args, index);
+	m_formula = std::make_unique<concrete_formula<P>>(std::move(p));
+}
+
+template <typename P>
+void formula::concrete_formula<P>::stream(std::ostream& s, const std::vector<std::string>& args) const {
+	m_pred.stream(s, args);
+}
+
+template <typename T>
+void bound_type<T>::stream(std::ostream& out, const std::vector<std::string>&) const {
+	out << typeid(T).name();
+}
+
+template <typename T>
+auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
+        -> decltype(require_predicate(pred)) {
+	pred.collect_entities(ids, next_index);
+}
+
+template <typename... Ts>
+void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
+                      std::tuple<Ts...>& args) {
+	tuple_foreach(args, [&](auto& arg) { collect_entity(ids, next_index, arg); });
+}
+
+///////////////// streaming entities
+template <typename... Args>
+void stream(std::ostream& s, const std::vector<std::string>& args, const std::string& name,
+            const std::tuple<Args...>& tuple) {
+	s << name << '(';
+	indexed_tuple_foreach(tuple, [&](const auto& arg, std::size_t index) {
+		if (index) {
+			s << ", ";
+		}
+		arg.stream(s, args);
+	});
+	s << ')';
+}
+
+template <template <typename...> class Self, typename... Args>
+void basic_predicate<Self, Args...>::collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
+	soop::collect_entities(ids, next_index, args);
+}
+template <template <typename...> class Self, typename... Args>
+void basic_predicate<Self, Args...>::stream(std::ostream& out, const std::vector<std::string>& names) const {
+	soop::stream(out, names, self::name(), args);
+}
+
+
+template <typename... Args>
+bound_vars::bound_vars(Args... args) {
+	static_assert(sizeof...(Args) > 0, "");
+	m_str = "[";
+	indexed_tuple_foreach(std::tie(args...), [&](const auto& arg, std::size_t i) {
+		if (i) {
+			m_str += ", ";
+		}
+		m_str += arg.str();
+	});
+	m_str += ']';
+}
 
 } // namespace soop
 
