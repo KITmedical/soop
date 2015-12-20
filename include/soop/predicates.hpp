@@ -40,6 +40,7 @@ private:
 
 		void stream(std::ostream& s,
 		            const std::vector<std::string>& args) const final override;
+
 	private:
 		P m_pred;
 	};
@@ -81,8 +82,7 @@ using to_bound_type =
         std::conditional_t<std::is_base_of<entity, T>{}, bound_entity, std::remove_const_t<T>>;
 
 ///////////////// adding entities
-void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index,
-                           bound_entity& v);
+void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v);
 
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
@@ -193,7 +193,8 @@ formula::formula(P p) {
 }
 
 template <typename P>
-void formula::concrete_formula<P>::stream(std::ostream& s, const std::vector<std::string>& args) const {
+void formula::concrete_formula<P>::stream(std::ostream& s,
+                                          const std::vector<std::string>& args) const {
 	m_pred.stream(s, args);
 }
 
@@ -229,14 +230,15 @@ void stream(std::ostream& s, const std::vector<std::string>& args, const std::st
 }
 
 template <template <typename...> class Self, typename... Args>
-void basic_predicate<Self, Args...>::collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
+void basic_predicate<Self, Args...>::collect_entities(std::vector<std::size_t>& ids,
+                                                      std::size_t& next_index) {
 	soop::collect_entities(ids, next_index, args);
 }
 template <template <typename...> class Self, typename... Args>
-void basic_predicate<Self, Args...>::stream(std::ostream& out, const std::vector<std::string>& names) const {
+void basic_predicate<Self, Args...>::stream(std::ostream& out,
+                                            const std::vector<std::string>& names) const {
 	soop::stream(out, names, self::name(), args);
 }
-
 
 template <typename... Args>
 bound_vars::bound_vars(Args... args) {
