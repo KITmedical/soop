@@ -8,6 +8,7 @@ namespace soop {
 
 ontology::ontology() {
 	add_predicate<preds::instance_of_t>();
+	preds::instance_of);
 }
 
 std::size_t ontology::add_axiom(formula axiom) {
@@ -96,27 +97,27 @@ void ontology::reseat_entity(std::size_t id, const entity& e) {
 
 std::string ontology::types() const {
 	return it_transform_join(m_known_types.begin(), m_known_types.end(),
-			[](const std::string& s) {return not s.empty();},
-			[](const std::string& t) {
+		[](const std::string& s) {return not s.empty();},
+		[](const std::string& t) {
 			return "(" + t +", 0)";
-			});
+		});
 }
 
 std::string ontology::entities() const {
 	return it_transform_join(m_entities.begin(), m_entities.end(),
-			[](const auto& e) {return e.first != nullptr;},
-			[](const auto& e) {
+		[](const auto& e) {return e.first != nullptr;},
+		[](const auto& e) {
 			return "(" + e.first->name() +", 0)";
-			});
+		});
 }
 
 std::string ontology::predicates() const {
 	// TODO: deleted predicates
 	return it_transform_join(m_predicate_names.begin(), m_predicate_names.end(),
-			[](const auto&){return true;},
-			[](const auto& p) {
+		[](const auto&){return true;},
+		[](const auto& p) {
 			return "(" + p.first + ", " + std::to_string(p.second) + ")";
-			});
+		});
 }
 
 std::string ontology::axioms() const {

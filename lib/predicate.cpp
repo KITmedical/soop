@@ -20,13 +20,10 @@ void dyn_type::stream(std::ostream& out, const std::vector<std::string>&) const 
 	out << m_type.name();
 }
 
-
-void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index,
-                           bound_entity& v) {
+void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v) {
 	ids.push_back(v.id);
 	v.id = next_index;
 	++next_index;
 }
-
 
 } // namespace soop
