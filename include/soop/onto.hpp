@@ -10,7 +10,7 @@
 
 namespace soop {
 
-SOOP_MAKE_PREDICATE(equal, 2)
+SOOP_MAKE_RENAMED_PREDICATE(equal, "=", 2)
 SOOP_MAKE_PREDICATE(instance_of, 2)
 SOOP_MAKE_PREDICATE(implies, 2)
 SOOP_MAKE_RENAMED_PREDICATE(or_, "or", 2)
@@ -27,7 +27,7 @@ struct forall_t : is_predicate {
 		collect_entity(ids, next_index, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "forall(" << vars.str() << ", ";
+		out << "(forall " << vars.str() << " ";
 		pred.stream(out, names);
 		out << ')';
 	}
@@ -49,7 +49,7 @@ struct exists_t : is_predicate{
 		collect_entity(ids, next_index, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "exists(" << vars.str() << ", ";
+		out << "(exists " << vars.str() << " ";
 		pred.stream(out, names);
 		out << ')';
 	}

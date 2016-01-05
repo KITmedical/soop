@@ -1,5 +1,5 @@
-#ifndef SPASS_HPP
-#define SPASS_HPP
+#ifndef SOOP_Z3_HPP
+#define SOOP_Z3_HPP
 
 #include <string>
 

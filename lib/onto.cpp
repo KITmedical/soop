@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "soop/spass.hpp"
+#include "soop/z3.hpp"
 
 namespace soop {
 
@@ -50,44 +50,23 @@ void ontology::delete_entity(std::size_t id) {
 }
 
 bool ontology::request(const formula& conjecture) const {
-	auto types = this->types();
+	const auto types = this->types();
 	const auto entities = this->entities();
 	const auto predicates = this->predicates();
 	const auto axioms = this->axioms();
 
-	if (not types.empty() and not entities.empty()) {
-		types += ",\n";
-	}
-
-	const auto problem = 
-		"begin_problem(prob).\n"
-
-		"list_of_descriptions.\n"
-		"name({**}).\n"
-		"author({**}).\n"
-		"status(unsatisfiable).\n"
-		"description({**}).\n"
-		"end_of_list.\n"
-
-		"list_of_symbols.\n"
-		"functions["
-		+ types + entities +
-		"].\n"
-		"predicates[\n"
-		+ predicates +
-		"].\n"
-		"end_of_list.\n"
-
-		"list_of_formulae(axioms).\n"
-		+ axioms +
-		"end_of_list.\n"
-
-		"list_of_formulae(conjectures).\n"
-		"formula(" + conjecture.to_string() + ").\n"
-		"end_of_list.\n"
-
-		"end_problem.\n\n";
-	return try_proof(problem);
+	const auto problem
+		= "(declare-sort Entity)\n"
+		+ types
+		+ entities
+		+ predicates
+		+ axioms
+		+ "(push)\n"
+		  "\t(assert (not " + conjecture.to_string() + "))\n"
+		  "\t(check-sat)\n"
+		  "\t(echo \"\")\n"
+		  "(pop)\n";
+	return !try_proof(problem);
 }
 
 void ontology::reseat_entity(std::size_t id, const entity& e) {
@@ -98,16 +77,16 @@ std::string ontology::types() const {
 	return it_transform_join(m_known_types.begin(), m_known_types.end(),
 		[](const std::string& s) {return not s.empty();},
 		[](const std::string& t) {
-			return "(" + t +", 0)";
-		});
+			return "(declare-const " + t +" Entity)\n";
+		}, "");
 }
 
 std::string ontology::entities() const {
 	return it_transform_join(m_entities.begin(), m_entities.end(),
 		[](const auto& e) {return e.first != nullptr;},
 		[](const auto& e) {
-			return "(" + e.first->name() +", 0)";
-		});
+			return "(declare-const " + e.first->name() +" Entity)\n";
+		}, "");
 }
 
 std::string ontology::predicates() const {
@@ -115,8 +94,8 @@ std::string ontology::predicates() const {
 	return it_transform_join(m_predicate_names.begin(), m_predicate_names.end(),
 		[](const auto&){return true;},
 		[](const auto& p) {
-			return "(" + p.first + ", " + std::to_string(p.second) + ")";
-		});
+			return "(declare-fun " + p.first + " (" + repeat("Entity ",p.second) + ") Bool)\n";
+		}, "");
 }
 
 std::string ontology::axioms() const {
@@ -125,9 +104,9 @@ std::string ontology::axioms() const {
 		if (not axiom) {
 			continue;
 		}
-		ret += "formula(";
+		ret += "(assert ";
 		ret += axiom.to_string();
-		ret += ").\n";
+		ret += ")\n";
 	}
 	return ret;
 }

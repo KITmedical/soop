@@ -32,9 +32,17 @@ std::string it_transform_join(It begin, It e, F f, T t, const std::string& del =
 		return "";
 	}
 	auto ret = std::string{t(*it)};
-	for (it = std::find_if(it, e, f); it != e; it = std::find_if(std::next(it), e, f)) {
+	for (it = std::find_if(std::next(it), e, f); it != e; it = std::find_if(std::next(it), e, f)) {
 		ret += del;
 		ret += t(*it);
+	}
+	return ret;
+}
+
+inline std::string repeat(const std::string& str, std::size_t n) {
+	auto ret = std::string{};
+	for(auto i = std::size_t{}; i < n; ++i) {
+		ret += str;
 	}
 	return ret;
 }
