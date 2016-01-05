@@ -8,7 +8,6 @@ namespace soop {
 
 ontology::ontology() {
 	add_predicate<preds::instance_of_t>();
-	preds::instance_of);
 }
 
 std::size_t ontology::add_axiom(formula axiom) {
