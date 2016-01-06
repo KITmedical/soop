@@ -34,7 +34,7 @@ bool try_proof(const std::string& problem) {
 		return false;
 	} else {
 		std::cerr << problem;
-		throw std::runtime_error{"Didn't find an answer"};
+		throw no_answer_found_error{"Didn't find an answer"};
 	}
 }
 
