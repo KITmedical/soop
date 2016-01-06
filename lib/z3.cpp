@@ -14,10 +14,18 @@ bool begins_with(const std::string& larger, const std::string& prefix) {
 }
 
 bool try_proof(const std::string& problem) {
-	procxx::process z3{"z3", "-in", "-nw"};
-	z3.exec();
+	static procxx::process z3{"z3", "-in", "-nw"};
+	static int dummy = [&]{
+		z3.exec();
+		return 0;
+	}();
+	(void) dummy;
+
+	z3 << "(push)\n";
 	z3 << problem;
-	z3.close(procxx::pipe_t::write_end());
+	z3 << "(pop)\n";
+
+	z3.output().sync();
 	std::string line;
 	std::getline(z3.output(), line);
 	if (line == "sat") {

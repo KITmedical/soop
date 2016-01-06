@@ -64,7 +64,6 @@ bool ontology::request(const formula& conjecture) const {
 		+ "(push)\n"
 		  "\t(assert (not " + conjecture.to_string() + "))\n"
 		  "\t(check-sat)\n"
-		  "\t(echo \"\")\n"
 		  "(pop)\n";
 	return !try_proof(problem);
 }
