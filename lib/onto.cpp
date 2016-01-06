@@ -73,28 +73,28 @@ void ontology::reseat_entity(std::size_t id, const entity& e) {
 }
 
 std::string ontology::types() const {
-	return it_transform_join(m_known_types.begin(), m_known_types.end(),
+	return transform_if(m_known_types.begin(), m_known_types.end(),
 		[](const std::string& s) {return not s.empty();},
 		[](const std::string& t) {
 			return "(declare-const " + t +" Entity)\n";
-		}, "");
+		});
 }
 
 std::string ontology::entities() const {
-	return it_transform_join(m_entities.begin(), m_entities.end(),
+	return transform_if(m_entities.begin(), m_entities.end(),
 		[](const auto& e) {return e.first != nullptr;},
 		[](const auto& e) {
 			return "(declare-const " + e.first->name() +" Entity)\n";
-		}, "");
+		});
 }
 
 std::string ontology::predicates() const {
 	// TODO: deleted predicates
-	return it_transform_join(m_predicate_names.begin(), m_predicate_names.end(),
+	return transform_if(m_predicate_names.begin(), m_predicate_names.end(),
 		[](const auto&){return true;},
 		[](const auto& p) {
 			return "(declare-fun " + p.first + " (" + repeat("Entity ",p.second) + ") Bool)\n";
-		}, "");
+		});
 }
 
 std::string ontology::axioms() const {
