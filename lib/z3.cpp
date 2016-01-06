@@ -21,9 +21,9 @@ bool try_proof(const std::string& problem) {
 	}();
 	(void) dummy;
 
-	z3 << "(push)\n";
-	z3 << problem;
-	z3 << "(pop)\n";
+	z3 << "(push)\n"
+	   << problem
+	   << "(pop)\n";
 
 	z3.output().sync();
 	std::string line;
