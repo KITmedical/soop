@@ -10,7 +10,7 @@
 
 namespace soop {
 
-SOOP_MAKE_PREDICATE(equal, 2)
+SOOP_MAKE_RENAMED_PREDICATE(equal, "=", 2)
 SOOP_MAKE_PREDICATE(instance_of, 2)
 SOOP_MAKE_PREDICATE(implies, 2)
 SOOP_MAKE_RENAMED_PREDICATE(or_, "or", 2)
@@ -27,7 +27,7 @@ struct forall_t : is_predicate {
 		collect_entity(ids, next_index, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "forall(" << vars.str() << ", ";
+		out << "(forall " << vars.str() << " ";
 		pred.stream(out, names);
 		out << ')';
 	}
@@ -49,7 +49,7 @@ struct exists_t : is_predicate{
 		collect_entity(ids, next_index, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "exists(" << vars.str() << ", ";
+		out << "(exists " << vars.str() << " ";
 		pred.stream(out, names);
 		out << ')';
 	}
@@ -115,6 +115,11 @@ private:
 	std::unordered_set<std::pair<std::string, std::size_t>, hash_first> m_predicate_names;
 };
 
+class already_known_error: public std::invalid_argument {
+public:
+	using std::invalid_argument::invalid_argument;
+};
+
 /////////////////////////////////////////////////////////////
 //             Implementation of templates
 /////////////////////////////////////////////////////////////
@@ -133,8 +138,7 @@ template <typename T>
 void ontology::add_type() {
 	auto name = std::string{typeid(T).name()};
 	if (m_known_types.count(name)) {
-		// TODO: customn exception:
-		throw std::invalid_argument{"type already known"};
+		throw already_known_error{"type already known"};
 	}
 	m_known_types.insert(std::move(name));
 }

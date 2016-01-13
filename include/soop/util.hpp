@@ -26,15 +26,18 @@ std::string join(std::string head, const Tail&... tail) {
 }
 
 template <typename It, typename F, typename T>
-std::string it_transform_join(It begin, It e, F f, T t, const std::string& del = ",\n") {
-	auto it = std::find_if(begin, e, f);
-	if (it == e) {
-		return "";
-	}
-	auto ret = std::string{t(*it)};
-	for (it = std::find_if(it, e, f); it != e; it = std::find_if(std::next(it), e, f)) {
-		ret += del;
+std::string transform_if(It begin, It e, F f, T t) {
+	auto ret = std::string{};
+	for (auto it = std::find_if(begin, e, f); it != e; it = std::find_if(std::next(it), e, f)) {
 		ret += t(*it);
+	}
+	return ret;
+}
+
+inline std::string repeat(const std::string& str, std::size_t n) {
+	auto ret = std::string{};
+	for(auto i = std::size_t{}; i < n; ++i) {
+		ret += str;
 	}
 	return ret;
 }

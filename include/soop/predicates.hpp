@@ -219,12 +219,10 @@ void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
 template <typename... Args>
 void stream(std::ostream& s, const std::vector<std::string>& args, const std::string& name,
             const std::tuple<Args...>& tuple) {
-	s << name << '(';
-	indexed_tuple_foreach(tuple, [&](const auto& arg, std::size_t index) {
-		if (index) {
-			s << ", ";
-		}
+	s << '(' << name << ' ';
+	tuple_foreach(tuple, [&](const auto& arg) {
 		arg.stream(s, args);
+		s << ' ';
 	});
 	s << ')';
 }
@@ -243,14 +241,13 @@ void basic_predicate<Self, Args...>::stream(std::ostream& out,
 template <typename... Args>
 bound_vars::bound_vars(Args... args) {
 	static_assert(sizeof...(Args) > 0, "");
-	m_str = "[";
-	indexed_tuple_foreach(std::tie(args...), [&](const auto& arg, std::size_t i) {
-		if (i) {
-			m_str += ", ";
-		}
+	m_str = "(";
+	tuple_foreach(std::tie(args...), [&](const auto& arg) {
+		m_str += "(";
 		m_str += arg.str();
+		m_str += " Entity) ";
 	});
-	m_str += ']';
+	m_str += ')';
 }
 
 } // namespace soop
