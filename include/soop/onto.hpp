@@ -13,8 +13,9 @@ namespace soop {
 SOOP_MAKE_RENAMED_PREDICATE(equal, "=", 2)
 SOOP_MAKE_PREDICATE(instance_of, 2)
 SOOP_MAKE_PREDICATE(implies, 2)
-SOOP_MAKE_RENAMED_PREDICATE(or_, "or", 2)
-SOOP_MAKE_RENAMED_PREDICATE(and_, "and", 2)
+SOOP_MAKE_PREDICATE(distinct, variadic_rank)
+SOOP_MAKE_RENAMED_PREDICATE(or_, "or", variadic_rank)
+SOOP_MAKE_RENAMED_PREDICATE(and_, "and", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
 
 namespace preds {

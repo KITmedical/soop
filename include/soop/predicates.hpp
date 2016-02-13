@@ -9,6 +9,7 @@
 #include <iterator>
 #include <iostream>
 #include <typeindex>
+#include <limits>
 
 #include "entity.hpp"
 #include "type_checking.hpp"
@@ -148,6 +149,8 @@ using base_basic_predicate_t = typename base_basic_predicate<T>::type;
 
 struct get_meta_information {};
 
+static constexpr auto variadic_rank = std::numeric_limits<std::size_t>::max();
+
 #define SOOP_MAKE_RENAMED_TYPECHECKED_PREDICATE(Identifier, Name, Rank, ...)                       \
 	namespace preds {                                                                          \
 	template <typename... Args>                                                                \
@@ -157,7 +160,7 @@ struct get_meta_information {};
 		                  std::move(args)...} {}                                           \
 		static std::string name() { return Name; }                                         \
 		constexpr static std::size_t rank() { return (Rank); }                             \
-		static_assert(sizeof...(Args) == (Rank),                                           \
+		static_assert((sizeof...(Args) == (Rank)) or ((Rank) == ::soop::variadic_rank),    \
 		              "Invalid number of arguments to predicate");                         \
 	};                                                                                         \
 	template <>                                                                                \
