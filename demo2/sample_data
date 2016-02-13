@@ -1,0 +1,16 @@
+
+
+speaker 0 "Motoko Kusanagi"
+speaker 1 "Teresa of the faint Smile"
+speaker 2 "Alucard"
+
+talk "Hacking Humans" "How to use the advances in cyberisation to get your work done" 0
+talk "Yoki Sensing" "Predicting your enemys movements in sword-fights" 1
+talk "Becoming Immortal" "How to dring so much blood, that you become basically impossible to kill" 2
+talk "Killing Immortals" "How to kill someone who is basically immortal" 1
+
+room 1
+room 2
+
+slot 1
+slot 2
