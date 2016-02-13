@@ -77,7 +77,14 @@ std::string ontology::types() const {
 		[](const std::string& s) {return not s.empty();},
 		[](const std::string& t) {
 			return "(declare-const " + t +" Entity)\n";
-		});
+		})+
+		"(assert (distinct "+
+		transform_if(m_known_types.begin(), m_known_types.end(),
+		[](const std::string& s) {return not s.empty();},
+		[](const std::string& t) {
+			return " " + t +" \n";
+		})+
+		"))\n";
 }
 
 std::string ontology::entities() const {
@@ -85,7 +92,19 @@ std::string ontology::entities() const {
 		[](const auto& e) {return e.first != nullptr;},
 		[](const auto& e) {
 			return "(declare-const " + e.first->name() +" Entity)\n";
-		});
+		}) +
+		"(assert (forall ((x Entity)) (or\n" +
+		transform_if(m_entities.begin(), m_entities.end(),
+		[](const auto& e) {return e.first != nullptr;},
+		[](const auto& e) {
+			return "(= x " + e.first->name() +")\n";
+		})+
+		transform_if(m_known_types.begin(), m_known_types.end(),
+		[](const std::string& s) {return not s.empty();},
+		[](const std::string& t) {
+			return "(= x " + t +")\n";
+		})+
+		")))\n";
 }
 
 std::string ontology::predicates() const {
