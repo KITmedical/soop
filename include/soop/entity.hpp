@@ -33,8 +33,6 @@ public:
 
 private:
 	friend class ontology;
-	template<typename T>
-	friend auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred);
 	ontology* m_ontology = nullptr;
 	std::size_t m_id = 0;
 };
