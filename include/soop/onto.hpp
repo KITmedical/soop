@@ -18,6 +18,8 @@ SOOP_MAKE_RENAMED_PREDICATE(or_, "or", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(and_, "and", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
 
+constexpr auto result = variable<'r','e','s','u','l','t'>{};
+
 namespace preds {
 //////////////////////////// forall
 
@@ -76,6 +78,10 @@ class pred_list{
 
 using axiom_list = std::vector<formula>;
 
+struct not_found_error: std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
 class ontology {
 public:
 	ontology();
@@ -94,11 +100,17 @@ public:
 	void add_type();
 	bool request(const formula& conjecture) const;
 
+	template<typename T>
+	const T& request_entity(const formula& description) const;
+	template<typename T>
+	const T* request_entity_ptr(const formula& description) const;
+
 	void reseat_entity(std::size_t id, const entity& e);
 
 	template<template<typename...>class P>
 	void add_predicate();
 private:
+	const entity* request_entity_impl(const formula& description) const;
 	std::string types() const;
 	std::string entities() const;
 	std::string predicates() const;
@@ -143,6 +155,21 @@ void ontology::add_type() {
 		throw already_known_error{"type already known"};
 	}
 	m_known_types.insert(std::move(name));
+}
+
+template<typename T>
+const T& ontology::request_entity(const formula& description) const {
+	auto res = request_entity_ptr<T>(description);
+	if (res) {
+		return *res;
+	} else {
+		throw not_found_error{"no such entity found"};
+	}
+}
+template<typename T>
+const T* ontology::request_entity_ptr(const formula& description) const {
+	auto ptr = request_entity_impl(description);
+	return dynamic_cast<const T*>(ptr);
 }
 
 template<template<typename...>class P>

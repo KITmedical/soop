@@ -62,12 +62,36 @@ bool ontology::request(const formula& conjecture) const {
 		+ entities
 		+ predicates
 		+ axioms
-		+ entity_ids
 		+ "(push)\n"
 		  "\t(assert (not " + conjecture.to_string() + "))\n"
 		  "\t(check-sat)\n"
 		  "(pop)\n";
 	return !try_proof(problem);
+}
+
+
+const entity* ontology::request_entity_impl(const formula& description) const {
+	const auto types = this->types();
+	const auto entities = this->entities();
+	const auto predicates = this->predicates();
+	const auto axioms = this->axioms();
+	const auto entity_ids = this->entity_ids();
+
+	const auto problem
+		= "(declare-sort Entity)\n"
+		+ types
+		+ entities
+		+ predicates
+		+ axioms
+		+ entity_ids
+		+ "(declare-const result Entity)\n"
+		+ "(assert " + description.to_string() + ")\n";
+	const auto res_id = ::soop::request_entity(problem);
+	if (res_id > m_entities.size()) {
+		return nullptr;
+	} else {
+		return m_entities.at(res_id).first;
+	}
 }
 
 void ontology::reseat_entity(std::size_t id, const entity& e) {

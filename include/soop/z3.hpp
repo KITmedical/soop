@@ -17,6 +17,7 @@ public:
 };
 
 bool try_proof(const std::string& request);
+std::size_t request_entity(const std::string& problem);
 
 } // namespace soop
 
