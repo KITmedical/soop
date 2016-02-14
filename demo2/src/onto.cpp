@@ -4,11 +4,11 @@
 
 namespace {
 const soop::variable<'T', '1'> t1{};
-const soop::variable<'T', '1'> t2{};
+const soop::variable<'T', '2'> t2{};
 const soop::variable<'S', '1'> s1{};
-const soop::variable<'S', '1'> s2{};
+const soop::variable<'S', '2'> s2{};
 const soop::variable<'R', '1'> r1{};
-const soop::variable<'R', '1'> r2{};
+const soop::variable<'R', '2'> r2{};
 const soop::variable<'S', 'l', '1'> sl1{};
 const soop::variable<'S', 'l', '2'> sl2{};
 
@@ -82,6 +82,15 @@ soop::formula entities_have_only_one_type() {
 	return forall({T1,T2,i}, implies(and_(instance_of(i, T1), instance_of(i, T2)),equal(T1,T2)));
 }
 
+soop::formula one_talk_per_speaker_per_slot() {
+	return forall({t1,s1,r1,sl1}, implies(
+		talk_assignment(t1, s1, r1, sl1),
+		forall({t2,r2},
+			implies(
+				talk_assignment(t2,s1,r2,sl1),
+				and_(equal(t1,t2), equal(r1,r2))))));
+}
+
 } // namespace
 
 soop::ontology make_ontology() {
@@ -103,6 +112,16 @@ soop::ontology make_ontology() {
 	onto.add_axiom(only_speakers_hold_their_talk());
 	onto.add_axiom(types_are_no_instances());
 	onto.add_axiom(entities_have_only_one_type());
+	onto.add_axiom(one_talk_per_speaker_per_slot());
 	return onto;
 }
 
+namespace preds {
+void distinct_t::stream(std::ostream& out, const std::vector<std::string>&) const {
+	out << "(distinct ";
+	for(auto eptr: m_entities) {
+		out << eptr->name() << ' ';
+	}
+	out << ')';
+}
+} // namespace preds

@@ -27,6 +27,8 @@ int main(int argc, char** argv) try {
 		o.add_axiom(preds::is_speaker_of(data.speakers.at(talk->speaker_id()), talk));
 	}
 
+	o.add_axiom(preds::distinct(data.talks.begin(), data.talks.end()));
+
 	std::cout << std::boolalpha;
 
 	const soop::variable<'T'> t{};
