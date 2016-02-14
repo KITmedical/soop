@@ -31,17 +31,28 @@ int main(int argc, char** argv) try {
 
 	std::cout << std::boolalpha;
 
-	const soop::variable<'T'> t{};
 	const soop::variable<'S'> s{};
 	const soop::variable<'R'> r{};
 	const soop::variable<'S', 'l'> sl{};
 
 	using namespace preds;
 	using namespace soop::preds;
-	std::cout << o.request(
-	                     forall({t}, implies(instance_of(t, soop::type<talk>),
-	                                         exists({s, r, sl}, talk_assignment(t, s, r, sl)))))
-	          << '\n';
+
+	for(const auto& talk: data.talks) {
+		std::cout
+			<< talk->title() << "(" << talk.id() << "): "
+			<< "in room #";
+		const auto& used_room =  o.request_entity<room>(exists({s, sl}, talk_assignment(talk, s, soop::result, sl)));
+		//o.add_axiom(exists({s,sl}, talk_assignment(talk, s, used_room, sl)));
+		std::cout
+			<< used_room->number()
+			<<", in slot #";
+		const auto& used_slot = o.request_entity<slot>(exists({s, r}, talk_assignment(talk, s, r , soop::result)));
+		o.add_axiom(talk_assignment(talk, data.speakers.at(talk->speaker_id()), used_room, used_slot));
+		std::cout
+			<< used_slot->time()
+			<< '\n';
+	}
 
 } catch (std::runtime_error& e) {
 	std::cerr << "Error: " << e.what() << '\n';

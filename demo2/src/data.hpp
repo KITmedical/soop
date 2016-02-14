@@ -26,7 +26,7 @@ public:
 	talk_t(const std::string& title, const std::string& desc, std::size_t s)
 	        : m_title{title}, m_desc{desc}, m_speaker_id{s} {}
 	std::size_t speaker_id() const { return m_speaker_id; }
-
+	const std::string& title() const {return m_title;}
 private:
 	std::string m_title;
 	std::string m_desc;
