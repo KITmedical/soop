@@ -54,6 +54,7 @@ bool ontology::request(const formula& conjecture) const {
 	const auto entities = this->entities();
 	const auto predicates = this->predicates();
 	const auto axioms = this->axioms();
+	const auto entity_ids = this->entity_ids();
 
 	const auto problem
 		= "(declare-sort Entity)\n"
@@ -61,6 +62,7 @@ bool ontology::request(const formula& conjecture) const {
 		+ entities
 		+ predicates
 		+ axioms
+		+ entity_ids
 		+ "(push)\n"
 		  "\t(assert (not " + conjecture.to_string() + "))\n"
 		  "\t(check-sat)\n"
@@ -126,6 +128,25 @@ std::string ontology::axioms() const {
 		ret += axiom.to_string();
 		ret += ")\n";
 	}
+	return ret;
+}
+
+std::string ontology::entity_ids() const {
+	auto ret = std::string{"(define-fun to-entity-id ((e Entity)) Int\n"};
+	auto depth = std::size_t{1};
+	for(const auto& e: m_entities) {
+		if (e.first != nullptr) {
+			++depth;
+			ret += "(ite (= e ";
+			ret +=  e.first->name();
+			ret += ") ";
+			ret += std::to_string(e.first->id());
+			ret += "\n";
+		}
+	}
+	ret += std::to_string(std::numeric_limits<std::size_t>::max());
+	ret += std::string(depth, ')');
+	ret += '\n';
 	return ret;
 }
 

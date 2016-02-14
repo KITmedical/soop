@@ -103,6 +103,7 @@ private:
 	std::string entities() const;
 	std::string predicates() const;
 	std::string axioms() const;
+	std::string entity_ids() const;
 
 	struct hash_first {
 		std::size_t operator()(const std::pair<std::string, std::size_t>& p) const {
