@@ -31,16 +31,13 @@ int main(int argc, char** argv) try {
 
 	std::cout << std::boolalpha;
 
-	const soop::variable<'T'> t{};
 	const soop::variable<'S'> s{};
-	const soop::variable<'R'> r{};
 	const soop::variable<'S', 'l'> sl{};
 
 	using namespace preds;
 	using namespace soop::preds;
 
-	if (o.request(not_(forall({t}, implies(instance_of(t, soop::type<talk>),
-		exists({s,r,sl}, talk_assignment(t,s,r,sl))))))) {
+	if(!o.check_sat()) {
 		std::cout << "No solution exits.\n";
 		return 0;
 	}
@@ -53,7 +50,7 @@ int main(int argc, char** argv) try {
 		std::cout
 			<< used_room->number()
 			<<", in slot #";
-		const auto& used_slot = o.request_entity<slot>(exists({s, r}, talk_assignment(talk, s, r , soop::result)));
+		const auto& used_slot = o.request_entity<slot>(exists({s}, talk_assignment(talk, s, used_room, soop::result)));
 		o.add_axiom(talk_assignment(talk, data.speakers.at(talk->speaker_id()), used_room, used_slot));
 		std::cout
 			<< used_slot->time()
