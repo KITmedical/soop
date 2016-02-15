@@ -54,7 +54,6 @@ bool ontology::request(const formula& conjecture) const {
 	const auto entities = this->entities();
 	const auto predicates = this->predicates();
 	const auto axioms = this->axioms();
-	const auto entity_ids = this->entity_ids();
 
 	const auto problem
 		= "(declare-sort Entity)\n"
@@ -69,6 +68,21 @@ bool ontology::request(const formula& conjecture) const {
 	return !try_proof(problem);
 }
 
+bool ontology::check_sat() const {
+	const auto types = this->types();
+	const auto entities = this->entities();
+	const auto predicates = this->predicates();
+	const auto axioms = this->axioms();
+
+	const auto problem
+		= "(declare-sort Entity)\n"
+		+ types
+		+ entities
+		+ predicates
+		+ axioms
+		+ "\t(check-sat)\n";
+	return try_proof(problem);
+}
 
 const entity* ontology::request_entity_impl(const formula& description) const {
 	const auto types = this->types();

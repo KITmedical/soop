@@ -105,6 +105,8 @@ public:
 	template<typename T>
 	const T* request_entity_ptr(const formula& description) const;
 
+	bool check_sat() const;
+
 	void reseat_entity(std::size_t id, const entity& e);
 
 	template<template<typename...>class P>
