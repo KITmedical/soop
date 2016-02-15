@@ -50,7 +50,6 @@ int main(int argc, char** argv) try {
 			<< talk->title() << "(" << talk.id() << "): "
 			<< "in room #";
 		const auto& used_room =  o.request_entity<room>(exists({s, sl}, talk_assignment(talk, s, soop::result, sl)));
-		//o.add_axiom(exists({s,sl}, talk_assignment(talk, s, used_room, sl)));
 		std::cout
 			<< used_room->number()
 			<<", in slot #";
