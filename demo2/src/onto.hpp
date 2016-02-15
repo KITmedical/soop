@@ -17,13 +17,13 @@ public:
 	template<typename Iterator>
 	distinct_t(Iterator begin, Iterator end) {
 		for(auto it= begin; it != end; ++it) {
-			m_entities.emplace_back(&*it);
+			m_entities.emplace_back(it->id());
 		}
 	}
-	void collect_entities(std::vector<std::size_t>&, std::size_t&) {}
+	void collect_entities(std::vector<std::size_t>&, std::size_t&);
 	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 private:
-	std::vector<const soop::entity*> m_entities;
+	std::vector<std::size_t> m_entities;
 };
 
 template<typename Iterator>
