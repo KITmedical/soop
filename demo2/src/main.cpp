@@ -31,12 +31,19 @@ int main(int argc, char** argv) try {
 
 	std::cout << std::boolalpha;
 
+	const soop::variable<'T'> t{};
 	const soop::variable<'S'> s{};
 	const soop::variable<'R'> r{};
 	const soop::variable<'S', 'l'> sl{};
 
 	using namespace preds;
 	using namespace soop::preds;
+
+	if (o.request(not_(forall({t}, implies(instance_of(t, soop::type<talk>),
+		exists({s,r,sl}, talk_assignment(t,s,r,sl))))))) {
+		std::cout << "No solution exits.\n";
+		return 0;
+	}
 
 	for(const auto& talk: data.talks) {
 		std::cout
