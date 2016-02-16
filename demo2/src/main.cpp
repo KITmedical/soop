@@ -29,32 +29,27 @@ int main(int argc, char** argv) try {
 
 	o.add_axiom(soop::preds::distinct_range(data.talks.begin(), data.talks.end()));
 
-	std::cout << std::boolalpha;
-
-	const soop::variable<'S'> s{};
 	const soop::variable<'S', 'l'> sl{};
 
-	using namespace preds;
-	using namespace soop::preds;
+	using preds::talk_assignment;
+	using soop::preds::exists;
 
-	if(!o.check_sat()) {
+	if (!o.check_sat()) {
 		std::cout << "No solution exits.\n";
 		return 0;
 	}
 
-	for(const auto& talk: data.talks) {
-		std::cout
-			<< talk->title() << "(" << talk.id() << "): "
-			<< "in room #";
-		const auto& used_room =  o.request_entity<room>(exists({s, sl}, talk_assignment(talk, s, soop::result, sl)));
-		std::cout
-			<< used_room->number()
-			<<", in slot #";
-		const auto& used_slot = o.request_entity<slot>(exists({s}, talk_assignment(talk, s, used_room, soop::result)));
-		o.add_axiom(talk_assignment(talk, data.speakers.at(talk->speaker_id()), used_room, used_slot));
-		std::cout
-			<< used_slot->time()
-			<< '\n';
+	for (const auto& talk : data.talks) {
+		const auto& speaker = data.speakers.at(talk->speaker_id());
+		std::cout << talk->title();
+
+		const auto& used_room = o.request_entity<room>(exists({sl}, talk_assignment(talk, speaker, soop::result, sl)));
+		std::cout << ": in room #" << used_room->number();
+
+		const auto& used_slot = o.request_entity<slot>(talk_assignment(talk, speaker, used_room, soop::result));
+		std::cout <<", in slot #" << used_slot->time() << '\n';
+
+		o.add_axiom(talk_assignment(talk, speaker, used_room, used_slot));
 	}
 
 } catch (std::runtime_error& e) {
