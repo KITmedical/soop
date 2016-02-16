@@ -116,20 +116,3 @@ soop::ontology make_ontology() {
 	return onto;
 }
 
-namespace preds {
-void distinct_t::collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
-	for(auto& id: m_entities) {
-		ids.push_back(id);
-		id = next_index;
-		++next_index;
-	}
-}
-
-void distinct_t::stream(std::ostream& out, const std::vector<std::string>& args) const {
-	out << "(distinct ";
-	for(auto i: m_entities) {
-		out << args.at(i) << ' ';
-	}
-	out << ')';
-}
-} // namespace preds

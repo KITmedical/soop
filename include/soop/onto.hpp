@@ -18,6 +18,27 @@ SOOP_MAKE_RENAMED_PREDICATE(or_, "or", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(and_, "and", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
 
+namespace preds {
+class distinct_range_t: public soop::is_predicate {
+public:
+	template<typename Iterator>
+	distinct_range_t(Iterator begin, Iterator end) {
+		for(auto it= begin; it != end; ++it) {
+			m_entities.emplace_back(it->id());
+		}
+	}
+	void collect_entities(std::vector<std::size_t>&, std::size_t&);
+	void stream(std::ostream& out, const std::vector<std::string>& names) const;
+private:
+	std::vector<std::size_t> m_entities;
+};
+
+template<typename Iterator>
+distinct_range_t distinct_range(Iterator first, Iterator last) {
+	return distinct_range_t{first, last};
+}
+} // namespace preds
+
 constexpr auto result = variable<'r','e','s','u','l','t'>{};
 
 namespace preds {
