@@ -72,8 +72,17 @@ private:
 	std::type_index m_type;
 };
 
+namespace impl{
+template<char...Str>
+struct not_reserved: std::true_type{};
+template<char...Tail>
+struct not_reserved<'o', '_', Tail...>: std::false_type{};
+} // namespace impl
+
 template <char... Name>
 struct variable {
+	static_assert(impl::not_reserved<Name...>::value,
+			"only unreserved names may be used for variables");
 	static std::string str() { return {Name...}; }
 	static void stream(std::ostream& out, const std::vector<std::string>&) { out << str(); }
 };
