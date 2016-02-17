@@ -1,7 +1,10 @@
 
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <iterator>
+#include <algorithm>
+
 #include <procxx.hpp>
 
 #include "soop/z3.hpp"
@@ -30,6 +33,11 @@ struct z3_transaction {
 	}
 };
 
+std::size_t result_id_from_line(const std::string& line) {
+	auto it = std::find_if(line.begin(), line.end(), [](char c){return std::isdigit(c);});
+	return std::stoul(std::string{it, line.end()}); // performance, robustnes what's that?
+}
+
 } // namespace
 
 bool try_proof(const std::string& problem) {
@@ -51,7 +59,7 @@ bool try_proof(const std::string& problem) {
 	}
 }
 
-std::size_t request_entity(const std::string& problem) {
+std::vector<std::size_t> request_entities(const std::string& problem, const std::vector<std::string>& results) {
 	z3_transaction transaction;
 	auto& z3 = get_z3();
 	z3 << problem << "(check-sat)\n";
@@ -60,16 +68,19 @@ std::size_t request_entity(const std::string& problem) {
 		
 	std::getline(z3.output(), line);
 	if (line != "sat") {
-		return std::numeric_limits<std::size_t>::max();
+		return {};
 	}
-	z3 << "(get-value ((to-entity-id result)))\n";
+	auto ret = std::vector<std::size_t>(results.size(), std::numeric_limits<std::size_t>::max());
+	for (const auto& res: results) {
+		z3 << "(get-value ((to-entity-id " << res << ")))\n";
+	}
 	z3.output().sync();
-	std::getline(z3.output(), line);
+	for (auto& r: ret) {
+		std::getline(z3.output(), line);
+		r = result_id_from_line(line);
+	}
 	// it's fragile, but who cares: ;)
-	line.erase(0, sizeof("(((to-entity-id result) ")-1u);
-
-	return std::stoul(line);
-
+	return ret;
 }
 
 } // namespace soop

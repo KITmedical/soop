@@ -84,12 +84,20 @@ bool ontology::check_sat() const {
 	return try_proof(problem);
 }
 
-const entity* ontology::request_entity_impl(const formula& description) const {
+std::vector<const entity*> ontology::request_entities_ptr(
+		const formula& description,
+		const std::vector<std::string>& result_names
+) const {
 	const auto types = this->types();
 	const auto entities = this->entities();
 	const auto predicates = this->predicates();
 	const auto axioms = this->axioms();
 	const auto entity_ids = this->entity_ids();
+
+	auto result_vars = std::string{};
+	for (const auto& var: result_names) {
+		result_vars += "(declare-const " + var + " Entity)\n";
+	}
 
 	const auto problem
 		= "(declare-sort Entity)\n"
@@ -98,14 +106,13 @@ const entity* ontology::request_entity_impl(const formula& description) const {
 		+ predicates
 		+ axioms
 		+ entity_ids
-		+ "(declare-const result Entity)\n"
+		+ result_vars
 		+ "(assert " + description.to_string() + ")\n";
-	const auto res_id = ::soop::request_entity(problem);
-	if (res_id > m_entities.size()) {
-		return nullptr;
-	} else {
-		return m_entities.at(res_id).first;
-	}
+	auto res_ids = ::soop::request_entities(problem, result_names);
+	auto retval = std::vector<const entity*>(result_names.size());
+	std::transform(res_ids.begin(), res_ids.end(), retval.begin(),
+			[&](auto id) {return id > m_entities.size()? nullptr : m_entities.at(id).first;});
+	return retval;
 }
 
 void ontology::reseat_entity(std::size_t id, const entity& e) {

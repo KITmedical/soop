@@ -2,6 +2,7 @@
 #define SOOP_Z3_HPP
 
 #include <string>
+#include <vector>
 #include <stdexcept>
 
 namespace soop {
@@ -17,7 +18,7 @@ public:
 };
 
 bool try_proof(const std::string& request);
-std::size_t request_entity(const std::string& problem);
+std::vector<std::size_t> request_entities(const std::string& problem, const std::vector<std::string>& results);
 
 } // namespace soop
 

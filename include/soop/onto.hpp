@@ -39,7 +39,6 @@ distinct_range_t distinct_range(Iterator first, Iterator last) {
 }
 } // namespace preds
 
-constexpr auto result = variable<'r','e','s','u','l','t'>{};
 
 namespace preds {
 //////////////////////////// forall
@@ -121,10 +120,10 @@ public:
 	void add_type();
 	bool request(const formula& conjecture) const;
 
-	template<typename T>
-	const T& request_entity(const formula& description) const;
-	template<typename T>
-	const T* request_entity_ptr(const formula& description) const;
+	std::vector<const entity*> request_entities_ptr(const formula& description, const std::vector<std::string>& result_names) const;
+
+	template<typename...Ts, typename... Vars>
+	std::tuple<const Ts&...> request_entities(const formula& description, Vars...) const;
 
 	bool check_sat() const;
 
@@ -133,7 +132,8 @@ public:
 	template<template<typename...>class P>
 	void add_predicate();
 private:
-	const entity* request_entity_impl(const formula& description) const;
+	template<typename...Ts, typename... Vars, std::size_t...Is>
+	std::tuple<const Ts&...> request_entities_impl(const formula& description, std::index_sequence<Is...>, Vars...) const;
 	std::string types() const;
 	std::string entities() const;
 	std::string predicates() const;
@@ -180,20 +180,20 @@ void ontology::add_type() {
 	m_known_types.insert(std::move(name));
 }
 
-template<typename T>
-const T& ontology::request_entity(const formula& description) const {
-	auto res = request_entity_ptr<T>(description);
-	if (res) {
-		return *res;
-	} else {
-		throw not_found_error{"no such entity found"};
+template<typename...Ts, typename... Vars, std::size_t...Is>
+std::tuple<const Ts&...> ontology::request_entities_impl(const formula& description, std::index_sequence<Is...>, Vars... vars) const {
+	const auto ids = request_entities_ptr(description, {vars.str()...});
+	if (std::any_of(ids.begin(), ids.end(), [](auto ptr){return not ptr;})) {
+		throw not_found_error{"some or all of the subrequests did not have a solution"};
 	}
+	return std::tie((dynamic_cast<const Ts&>(*ids.at(Is)))...);
 }
-template<typename T>
-const T* ontology::request_entity_ptr(const formula& description) const {
-	auto ptr = request_entity_impl(description);
-	return dynamic_cast<const T*>(ptr);
+template<typename...Ts, typename... Vars>
+std::tuple<const Ts&...> ontology::request_entities(const formula& description, Vars... vars) const {
+	return request_entities_impl<Ts...>(description, std::make_index_sequence<sizeof...(Vars)>{}, vars...);
 }
+
+
 
 template<template<typename...>class P>
 void ontology::add_predicate() {

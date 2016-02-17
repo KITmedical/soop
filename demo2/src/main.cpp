@@ -29,6 +29,7 @@ int main(int argc, char** argv) try {
 
 	o.add_axiom(soop::preds::distinct_range(data.talks.begin(), data.talks.end()));
 
+	const soop::variable<'r'> r{};
 	const soop::variable<'S', 'l'> sl{};
 
 	using preds::talk_assignment;
@@ -41,13 +42,15 @@ int main(int argc, char** argv) try {
 
 	for (const auto& talk : data.talks) {
 		const auto& speaker = data.speakers.at(talk->speaker_id());
-		std::cout << talk->title();
 
-		const auto& used_room = o.request_entity<room>(exists({sl}, talk_assignment(talk, speaker, soop::result, sl)));
-		std::cout << ": in room #" << used_room->number();
+		auto solution = o.request_entities<room, slot>(talk_assignment(talk, speaker, r, sl), r, sl);
+		const auto& used_room = std::get<0>(solution);
+		const auto& used_slot = std::get<1>(solution);
 
-		const auto& used_slot = o.request_entity<slot>(talk_assignment(talk, speaker, used_room, soop::result));
-		std::cout <<", in slot #" << used_slot->time() << '\n';
+		std::cout
+			<< talk->title()
+			<< ": in room #" << used_room->number()
+			<< ", in slot #" << used_slot->time() << '\n';
 
 		o.add_axiom(talk_assignment(talk, speaker, used_room, used_slot));
 	}
