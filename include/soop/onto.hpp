@@ -149,7 +149,7 @@ private:
 	std::vector<formula> m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;
 	std::unordered_set<std::string> m_known_types;
-	std::unordered_set<std::pair<std::string, std::size_t>, hash_first> m_predicate_names;
+	std::vector<std::pair<std::string, std::size_t>> m_predicate_names;
 };
 
 class already_known_error: public std::invalid_argument {
@@ -198,7 +198,7 @@ std::tuple<const Ts&...> ontology::request_entities(const formula& description, 
 template<template<typename...>class P>
 void ontology::add_predicate() {
 	using Pred = P<get_meta_information>;
-	m_predicate_names.insert(std::make_pair(Pred::name(), Pred::rank()));
+	m_predicate_names.emplace_back(Pred::name(), Pred::rank());
 }
 
 } // namespace soop
