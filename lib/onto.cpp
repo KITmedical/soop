@@ -36,7 +36,7 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 	e.m_ontology = this;
 	e.m_id = id;
 	m_entities.push_back({&e, {m_axioms.size()}});
-	auto axiom = formula{preds::instance_of(e, dyn_type{type})};
+	auto axiom = formula{preds::instance_of(e, bound_type{type})};
 	m_axioms.push_back(std::move(axiom));
 	return id;
 }

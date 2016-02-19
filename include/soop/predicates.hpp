@@ -56,9 +56,9 @@ struct bound_entity {
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
 
-class dyn_type {
+class bound_type {
 public:
-	dyn_type(const std::type_info& info) : m_type{info} {}
+	bound_type(const std::type_info& info) : m_type{info} {}
 	void stream(std::ostream& out, const std::vector<std::string>&) const;
 
 private:
@@ -66,7 +66,7 @@ private:
 };
 
 template <typename T>
-static auto type = dyn_type{typeid(T)};
+static auto type = bound_type{typeid(T)};
 
 
 namespace impl{
@@ -90,7 +90,7 @@ void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, boun
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
 
-inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const dyn_type&) {}
+inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const bound_type&) {}
 
 struct is_predicate {};
 constexpr void require_predicate(const is_predicate&) {}

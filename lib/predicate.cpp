@@ -16,7 +16,7 @@ void bound_entity::stream(std::ostream& out, const std::vector<std::string>& nam
 	out << names.at(id);
 }
 
-void dyn_type::stream(std::ostream& out, const std::vector<std::string>&) const {
+void bound_type::stream(std::ostream& out, const std::vector<std::string>&) const {
 	out << m_type.name();
 }
 
