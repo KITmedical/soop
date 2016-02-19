@@ -56,13 +56,6 @@ struct bound_entity {
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
 
-template <typename T>
-struct bound_type {
-	void stream(std::ostream& out, const std::vector<std::string>&) const;
-};
-template <typename T>
-static auto type = bound_type<T>{};
-
 class dyn_type {
 public:
 	dyn_type(const std::type_info& info) : m_type{info} {}
@@ -71,6 +64,10 @@ public:
 private:
 	std::type_index m_type;
 };
+
+template <typename T>
+static auto type = dyn_type{typeid(T)};
+
 
 namespace impl{
 template<char...Str>
@@ -87,18 +84,11 @@ struct variable {
 	static void stream(std::ostream& out, const std::vector<std::string>&) { out << str(); }
 };
 
-template <typename T>
-using to_bound_type =
-        std::conditional_t<std::is_base_of<entity, T>{}, bound_entity, std::remove_const_t<T>>;
-
 ///////////////// adding entities
 void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v);
 
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
-
-template <typename T>
-void collect_entity(std::vector<std::size_t>&, std::size_t&, bound_type<T>) {}
 
 inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const dyn_type&) {}
 
@@ -126,6 +116,10 @@ struct basic_predicate : is_predicate {
 	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 	std::tuple<Args...> args;
 };
+
+template <typename T>
+using to_bound_type =
+        std::conditional_t<std::is_base_of<entity, T>{}, bound_entity, std::decay_t<T>>;
 
 template <template <typename...> class Pred, typename... Args>
 auto make_pred(const Args&... args) {
@@ -208,11 +202,6 @@ template <typename P>
 void formula::concrete_formula<P>::stream(std::ostream& s,
                                           const std::vector<std::string>& args) const {
 	m_pred.stream(s, args);
-}
-
-template <typename T>
-void bound_type<T>::stream(std::ostream& out, const std::vector<std::string>&) const {
-	out << typeid(T).name();
 }
 
 template <typename T>
