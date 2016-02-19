@@ -177,22 +177,17 @@ std::string ontology::axioms() const {
 }
 
 std::string ontology::entity_ids() const {
-	auto ret = std::string{"(define-fun to-entity-id ((e Entity)) Int\n"};
+	std::ostringstream ret;
+	ret << "(define-fun to-entity-id ((e Entity)) Int\n";
 	auto depth = std::size_t{1};
 	for(const auto& e: m_entities) {
 		if (e.first != nullptr) {
 			++depth;
-			ret += "(ite (= e ";
-			ret +=  e.first->name();
-			ret += ") ";
-			ret += std::to_string(e.first->id());
-			ret += "\n";
+			ret << "(ite (= e " << e.first->name() << ") " << e.first->id() << '\n';
 		}
 	}
-	ret += std::to_string(std::numeric_limits<std::size_t>::max());
-	ret += std::string(depth, ')');
-	ret += '\n';
-	return ret;
+	ret << std::numeric_limits<std::size_t>::max() << std::string(depth, ')') << '\n';
+	return ret.str();
 }
 
 namespace preds {
