@@ -50,11 +50,18 @@ private:
 	std::vector<std::size_t> m_args;
 };
 
+
+///// Bound Entities
+
 struct bound_entity {
 	bound_entity(const entity& e) : id{e.id()} {}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
+
+void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v);
+
+///// Bound Types
 
 class bound_type {
 public:
@@ -68,6 +75,10 @@ private:
 template <typename T>
 static auto type = bound_type{typeid(T)};
 
+inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const bound_type&) {}
+
+
+///// Variables
 
 namespace impl{
 template<char...Str>
@@ -84,29 +95,48 @@ struct variable {
 	static void stream(std::ostream& out, const std::vector<std::string>&) { out << str(); }
 };
 
-///////////////// adding entities
-void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v);
-
 template <char... Name>
 void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
 
-inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const bound_type&) {}
+// bound variables (for quantors):
 
+class bound_vars {
+public:
+	template <typename... Args>
+	bound_vars(Args... args);
+	const std::string& str() const { return m_str; }
+
+private:
+	std::string m_str;
+};
+
+///// Predicates
+
+// Inheriting from is_predicate is a necessary bot not a sufficient
+// thing for predicates to do.
 struct is_predicate {};
-constexpr void require_predicate(const is_predicate&) {}
 
+namespace impl {
+constexpr void require_predicate(const is_predicate&); // not defined
+} // namespace impl
+
+// this will call pred.collect_entities(ids, next_index), meaning
+// that that function must be implemented
 template <typename T>
 auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
-        -> decltype(require_predicate(pred));
+        -> decltype(impl::require_predicate(pred));
 
-template <typename... Ts>
-void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
-                      std::tuple<Ts...>& args);
+// not shown, but required nonetheless: pred.stream(out, names)
 
-///////////////// streaming entities
-template <typename... Args>
-void stream(std::ostream& s, const std::vector<std::string>& args, const std::string& name,
-            const std::tuple<Args...>& tuple);
+
+// tag-type: Every predicate that is instantiated with this, should provide it's name
+// and it's rank via static methods without creating errors
+//
+// it is however acceptable to create a stand-in that provides the information,
+// should it be impossible to do directly in a good way.
+struct get_meta_information {};
+
+///// Predicate Helpers:
 
 template <template <typename...> class Self, typename... Args>
 struct basic_predicate : is_predicate {
@@ -126,16 +156,6 @@ auto make_pred(const Args&... args) {
 	return Pred<to_bound_type<Args>...>{args...};
 }
 
-class bound_vars {
-public:
-	template <typename... Args>
-	bound_vars(Args... args);
-	const std::string& str() const { return m_str; }
-
-private:
-	std::string m_str;
-};
-
 namespace impl {
 
 template <typename>
@@ -148,9 +168,8 @@ struct base_basic_predicate<Template<Args...>> {
 
 template <typename T>
 using base_basic_predicate_t = typename base_basic_predicate<T>::type;
-}
 
-struct get_meta_information {};
+} // namespace impl
 
 static constexpr auto variadic_rank = std::numeric_limits<std::size_t>::max();
 
@@ -187,6 +206,22 @@ static constexpr auto variadic_rank = std::numeric_limits<std::size_t>::max();
 #define SOOP_MAKE_PREDICATE(Identifier, Rank)                                                      \
 	SOOP_MAKE_RENAMED_TYPECHECKED_PREDICATE(Identifier, #Identifier, Rank, void)
 
+
+
+///// Utility-functions for the implementation:
+// these functions may be used by users of the library, which is why they are
+// not part of the impl-namespace
+
+// adding entities
+template <typename... Ts>
+void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
+                      std::tuple<Ts...>& args);
+
+// streaming entities
+template <typename... Args>
+void stream(std::ostream& s, const std::vector<std::string>& args, const std::string& name,
+            const std::tuple<Args...>& tuple);
+
 /////////////////////////////////////////////////////////////
 //             Implementation of templates
 /////////////////////////////////////////////////////////////
@@ -206,7 +241,7 @@ void formula::concrete_formula<P>::stream(std::ostream& s,
 
 template <typename T>
 auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
-        -> decltype(require_predicate(pred)) {
+        -> decltype(impl::require_predicate(pred)) {
 	pred.collect_entities(ids, next_index);
 }
 
