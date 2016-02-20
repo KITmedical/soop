@@ -20,10 +20,10 @@ void bound_type::stream(std::ostream& out, const std::vector<std::string>&) cons
 	out << m_type.name();
 }
 
-void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v) {
+void collect_entity(std::vector<std::size_t>& ids, bound_entity& v) {
+	const auto index = ids.size();
 	ids.push_back(v.id);
-	v.id = next_index;
-	++next_index;
+	v.id = index;
 }
 
 } // namespace soop

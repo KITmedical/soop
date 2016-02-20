@@ -191,11 +191,11 @@ std::string ontology::entity_ids() const {
 }
 
 namespace preds {
-void distinct_range_t::collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
+void distinct_range_t::collect_entities(std::vector<std::size_t>& ids) {
 	for(auto& id: m_entities) {
+		const auto index = ids.size();
 		ids.push_back(id);
-		id = next_index;
-		++next_index;
+		id = index;
 	}
 }
 

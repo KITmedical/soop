@@ -27,7 +27,7 @@ public:
 			m_entities.emplace_back(it->id());
 		}
 	}
-	void collect_entities(std::vector<std::size_t>&, std::size_t&);
+	void collect_entities(std::vector<std::size_t>&);
 	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 private:
 	std::vector<std::size_t> m_entities;
@@ -46,8 +46,8 @@ namespace preds {
 template <typename Pred>
 struct forall_t : is_predicate {
 	forall_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
-	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
-		collect_entity(ids, next_index, pred);
+	void collect_entities(std::vector<std::size_t>& ids) {
+		collect_entity(ids, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
 		out << "(forall " << vars.str() << " ";
@@ -68,8 +68,8 @@ auto forall(bound_vars vars, Pred p) {
 template <typename Pred>
 struct exists_t : is_predicate{
 	exists_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
-	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index) {
-		collect_entity(ids, next_index, pred);
+	void collect_entities(std::vector<std::size_t>& ids) {
+		collect_entity(ids, pred);
 	}
 	void stream(std::ostream& out, const std::vector<std::string>& names) const {
 		out << "(exists " << vars.str() << " ";

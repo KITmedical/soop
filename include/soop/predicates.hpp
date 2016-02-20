@@ -59,7 +59,7 @@ struct bound_entity {
 	std::size_t id; // before collection: id of the entity, after: argument_index
 };
 
-void collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, bound_entity& v);
+void collect_entity(std::vector<std::size_t>& ids, bound_entity& v);
 
 ///// Bound Types
 
@@ -75,7 +75,7 @@ private:
 template <typename T>
 static auto type = bound_type{typeid(T)};
 
-inline void collect_entity(std::vector<std::size_t>&, std::size_t&, const bound_type&) {}
+inline void collect_entity(std::vector<std::size_t>&, const bound_type&) {}
 
 
 ///// Variables
@@ -96,7 +96,7 @@ struct variable {
 };
 
 template <char... Name>
-void collect_entity(std::vector<std::size_t>&, std::size_t&, variable<Name...>) {}
+void collect_entity(std::vector<std::size_t>&, variable<Name...>) {}
 
 // bound variables (for quantors):
 
@@ -120,10 +120,10 @@ namespace impl {
 constexpr void require_predicate(const is_predicate&); // not defined
 } // namespace impl
 
-// this will call pred.collect_entities(ids, next_index), meaning
+// this will call pred.collect_entities(ids), meaning
 // that that function must be implemented
 template <typename T>
-auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
+auto collect_entity(std::vector<std::size_t>& ids, T& pred)
         -> decltype(impl::require_predicate(pred));
 
 // not shown, but required nonetheless: pred.stream(out, names)
@@ -142,7 +142,7 @@ template <template <typename...> class Self, typename... Args>
 struct basic_predicate : is_predicate {
 	basic_predicate(Args... args) : args{std::move(args)...} {}
 	using self = Self<Args...>;
-	void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index);
+	void collect_entities(std::vector<std::size_t>& ids);
 	void stream(std::ostream& out, const std::vector<std::string>& names) const;
 	std::tuple<Args...> args;
 };
@@ -214,8 +214,7 @@ static constexpr auto variadic_rank = std::numeric_limits<std::size_t>::max();
 
 // adding entities
 template <typename... Ts>
-void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
-                      std::tuple<Ts...>& args);
+void collect_entities(std::vector<std::size_t>& ids, std::tuple<Ts...>& args);
 
 // streaming entities
 template <typename... Args>
@@ -228,8 +227,7 @@ void stream(std::ostream& s, const std::vector<std::string>& args, const std::st
 
 template <typename P>
 formula::formula(P p) {
-	auto index = std::size_t{};
-	p.collect_entities(m_args, index);
+	p.collect_entities(m_args);
 	m_formula = std::make_unique<concrete_formula<P>>(std::move(p));
 }
 
@@ -240,15 +238,14 @@ void formula::concrete_formula<P>::stream(std::ostream& s,
 }
 
 template <typename T>
-auto collect_entity(std::vector<std::size_t>& ids, std::size_t& next_index, T& pred)
+auto collect_entity(std::vector<std::size_t>& ids, T& pred)
         -> decltype(impl::require_predicate(pred)) {
-	pred.collect_entities(ids, next_index);
+	pred.collect_entities(ids);
 }
 
 template <typename... Ts>
-void collect_entities(std::vector<std::size_t>& ids, std::size_t& next_index,
-                      std::tuple<Ts...>& args) {
-	tuple_foreach(args, [&](auto& arg) { collect_entity(ids, next_index, arg); });
+void collect_entities(std::vector<std::size_t>& ids, std::tuple<Ts...>& args) {
+	tuple_foreach(args, [&](auto& arg) { collect_entity(ids, arg); });
 }
 
 ///////////////// streaming entities
@@ -264,9 +261,8 @@ void stream(std::ostream& s, const std::vector<std::string>& args, const std::st
 }
 
 template <template <typename...> class Self, typename... Args>
-void basic_predicate<Self, Args...>::collect_entities(std::vector<std::size_t>& ids,
-                                                      std::size_t& next_index) {
-	soop::collect_entities(ids, next_index, args);
+void basic_predicate<Self, Args...>::collect_entities(std::vector<std::size_t>& ids) {
+	soop::collect_entities(ids, args);
 }
 template <template <typename...> class Self, typename... Args>
 void basic_predicate<Self, Args...>::stream(std::ostream& out,
