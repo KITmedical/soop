@@ -14,6 +14,8 @@ SOOP_MAKE_RENAMED_PREDICATE(equal, "=", 2)
 SOOP_MAKE_PREDICATE(instance_of, 2)
 SOOP_MAKE_PREDICATE(implies, 2)
 SOOP_MAKE_PREDICATE(distinct, variadic_rank)
+
+// TODO: this creates reserved identifiers:
 SOOP_MAKE_RENAMED_PREDICATE(or_, "or", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(and_, "and", variadic_rank)
 SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
@@ -139,12 +141,6 @@ private:
 	std::string predicates() const;
 	std::string axioms() const;
 	std::string entity_ids() const;
-
-	struct hash_first {
-		std::size_t operator()(const std::pair<std::string, std::size_t>& p) const {
-			return std::hash<std::string>{}(p.first);
-		}
-	};
 
 	std::vector<formula> m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;
