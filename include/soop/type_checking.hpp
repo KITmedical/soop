@@ -6,6 +6,7 @@
 
 namespace soop {
 
+template<char...> struct variable;
 
 template<typename...Ts>
 struct allowed_types_list{};
@@ -26,6 +27,11 @@ struct require_valid_type_t {
 
 template<typename Actual>
 struct require_valid_type_t<Actual, bool> {
+	enum { value = 0 };
+};
+
+template<char...Name, typename Expected>
+struct require_valid_type_t<variable<Name...>, Expected> {
 	enum { value = 0 };
 };
 
