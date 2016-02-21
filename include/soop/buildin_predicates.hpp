@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef SOOP_BUILDIN_PREDICATES_HPP
+#define SOOP_BUILDIN_PREDICATES_HPP
 
 #include <string>
 #include <vector>
@@ -124,3 +124,5 @@ auto exists(bound_vars vars, Pred p) {
 } // namespace preds
 
 } // namespace soop
+
+#endif // SOOP_BUILDIN_PREDICATES_HPP

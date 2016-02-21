@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SOOP_ONTO_HPP
+#define SOOP_ONTO_HPP
 
 #include <string>
 #include <typeinfo>
@@ -120,3 +121,5 @@ void ontology::add_predicate() {
 }
 
 } // namespace soop
+
+#endif // SOOP_ONTO_HPP
