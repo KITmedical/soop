@@ -2,92 +2,14 @@
 
 #include <string>
 #include <typeinfo>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
 #include "predicates.hpp"
 #include "entity.hpp"
+#include "buildin_predicates.hpp"
 
 namespace soop {
-
-SOOP_MAKE_RENAMED_PREDICATE(equal, "=", 2)
-SOOP_MAKE_PREDICATE(instance_of, 2)
-SOOP_MAKE_PREDICATE(implies, 2)
-SOOP_MAKE_PREDICATE(distinct, variadic_rank)
-
-// TODO: this creates reserved identifiers:
-SOOP_MAKE_RENAMED_PREDICATE(or_, "or", variadic_rank)
-SOOP_MAKE_RENAMED_PREDICATE(and_, "and", variadic_rank)
-SOOP_MAKE_RENAMED_PREDICATE(not_, "not", 1)
-
-namespace preds {
-class distinct_range_t: public soop::is_predicate {
-public:
-	template<typename Iterator>
-	distinct_range_t(Iterator begin, Iterator end) {
-		for(auto it= begin; it != end; ++it) {
-			m_entities.emplace_back(it->id());
-		}
-	}
-	void collect_entities(std::vector<std::size_t>&);
-	void stream(std::ostream& out, const std::vector<std::string>& names) const;
-private:
-	std::vector<std::size_t> m_entities;
-};
-
-template<typename Iterator>
-distinct_range_t distinct_range(Iterator first, Iterator last) {
-	return distinct_range_t{first, last};
-}
-} // namespace preds
-
-
-namespace preds {
-//////////////////////////// forall
-
-template <typename Pred>
-struct forall_t : is_predicate {
-	forall_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
-	void collect_entities(std::vector<std::size_t>& ids) {
-		collect_entity(ids, pred);
-	}
-	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "(forall " << vars.str() << " ";
-		pred.stream(out, names);
-		out << ')';
-	}
-	bound_vars vars;
-	Pred pred;
-};
-
-template <typename Pred>
-auto forall(bound_vars vars, Pred p) {
-	return forall_t<Pred>{std::move(vars), p};
-}
-
-//////////////////////////// exists
-
-template <typename Pred>
-struct exists_t : is_predicate{
-	exists_t(bound_vars vars, Pred pred) : vars{std::move(vars)}, pred{std::move(pred)} {}
-	void collect_entities(std::vector<std::size_t>& ids) {
-		collect_entity(ids, pred);
-	}
-	void stream(std::ostream& out, const std::vector<std::string>& names) const {
-		out << "(exists " << vars.str() << " ";
-		pred.stream(out, names);
-		out << ')';
-	}
-	bound_vars vars;
-	Pred pred;
-};
-
-template <typename Pred>
-auto exists(bound_vars vars, Pred p) {
-	return exists_t<Pred>{std::move(vars), p};
-}
-
-}
 
 template<typename... Types>
 struct type_list_t{};
