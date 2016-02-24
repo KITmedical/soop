@@ -10,10 +10,11 @@
 #include "onto.hpp"
 
 int main(int argc, char** argv) try {
-	if (argc != 2) {
-		std::cerr << "Usage: " << argv[0] << " <datafile>\n";
+	if (argc < 2 or argc > 3) {
+		std::cerr << "Usage: " << argv[0] << " <datafile> [checkonly]\n";
 		return 1;
 	}
+	const auto quit_early = (argc == 3 and argv[2] == std::string{"checkonly"});
 
 	std::ifstream file{argv[1]};
 	if (!file.is_open()) {
@@ -39,6 +40,9 @@ int main(int argc, char** argv) try {
 
 	if (!o.check_sat()) {
 		std::cout << "No solution exits.\n";
+		return 0;
+	}
+	if (quit_early) {
 		return 0;
 	}
 
