@@ -24,7 +24,9 @@ int main(int argc, char** argv) try {
 	auto data = read_dataset(file, o);
 
 	for (const auto& talk : data.talks) {
-		o.add_axiom(preds::is_speaker_of(data.speakers.at(talk->speaker_id()), talk));
+		for (const auto speaker_id: talk->speaker_ids()) {
+			o.add_axiom(preds::is_speaker_of(data.speakers.at(speaker_id), talk));
+		}
 	}
 
 	o.add_axiom(soop::preds::distinct_range(data.talks.begin(), data.talks.end()));
@@ -41,7 +43,7 @@ int main(int argc, char** argv) try {
 	}
 
 	for (const auto& talk : data.talks) {
-		const auto& speaker = data.speakers.at(talk->speaker_id());
+		const auto& speaker = data.speakers.at(talk->speaker_ids().front());
 
 		auto solution = o.request_entities<room, slot>(talk_assignment(talk, speaker, r, sl), r, sl);
 		const auto& used_room = std::get<0>(solution);

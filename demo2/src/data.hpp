@@ -23,14 +23,14 @@ using speaker = soop::e<speaker_t>;
 
 class talk_t {
 public:
-	talk_t(const std::string& title, const std::string& desc, std::size_t s)
-	        : m_title{title}, m_desc{desc}, m_speaker_id{s} {}
-	std::size_t speaker_id() const { return m_speaker_id; }
+	talk_t(const std::string& title, const std::string& desc, std::vector<std::size_t> s)
+	        : m_title{title}, m_desc{desc}, m_speaker_ids{std::move(s)} {}
+	const std::vector<std::size_t>& speaker_ids() const { return m_speaker_ids; }
 	const std::string& title() const {return m_title;}
 private:
 	std::string m_title;
 	std::string m_desc;
-	std::size_t m_speaker_id;
+	std::vector<std::size_t> m_speaker_ids;
 };
 using talk = soop::e<talk_t>;
 

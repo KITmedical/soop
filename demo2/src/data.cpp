@@ -43,19 +43,23 @@ void add_speaker(std::istream& stream, std::vector<speaker>& speakers, soop::ont
 	speakers.emplace_back(o, name, id);
 }
 
-void add_talk(std::istream& stream, std::vector<talk>& talks, std::size_t speakers,
+void add_talk(std::istream& stream, std::vector<talk>& talks, std::size_t max_speaker_id,
               soop::ontology& o) {
 	auto title = std::string{};
 	auto desc = std::string{};
-	auto speaker_id = std::size_t{};
-	stream >> std::quoted(title) >> std::quoted(desc) >> speaker_id;
-	if (speaker_id >= speakers) {
+	auto speaker_count = std::size_t{};
+	stream >> std::quoted(title) >> std::quoted(desc) >> speaker_count;
+	auto speakers = std::vector<std::size_t>{};
+	std::copy_n(std::istream_iterator<std::size_t>{stream}, speaker_count,
+	            std::back_inserter(speakers));
+	if (speakers.empty() or std::any_of(speakers.begin(), speakers.end(),
+	                                    [=](auto i) { return i >= max_speaker_id; })) {
 		throw std::invalid_argument{"bad speaker-id"};
 	}
 	if (title.empty()) {
 		throw std::invalid_argument{"bad talk-title"};
 	}
-	talks.emplace_back(o, title, desc, speaker_id);
+	talks.emplace_back(o, title, desc, std::move(speakers));
 }
 
 void add_slot(std::istream& stream, std::vector<slot>& slots, soop::ontology& o) {
@@ -69,5 +73,4 @@ void add_room(std::istream& stream, std::vector<room>& rooms, soop::ontology& o)
 	stream >> number;
 	rooms.emplace_back(o, number);
 }
-
 }

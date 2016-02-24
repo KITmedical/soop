@@ -22,15 +22,9 @@ soop::formula uniqueness_of_talks() {
 				talk_assignment(t1,s1,r1,sl1),
 				talk_assignment(t2,s2,r2,sl2)
 			),
-			and_(
-				equal(
-					equal(t1,t2),
-					and_(equal(r1,r2), equal(sl1,sl2))
-				),
-				implies(
-					equal(t1,t2),
-					equal(s1,s2)
-				)
+			equal(
+				equal(t1,t2),
+				and_(equal(r1,r2), equal(sl1,sl2))
 			)
 		)
 	);
@@ -46,17 +40,6 @@ soop::formula talk_assignment_is_typed() {
 					instance_of(r1, soop::type<room>),
 					instance_of(sl1, soop::type<slot>))),
 			not_(talk_assignment(t1,s1,r1,sl1))
-		)
-	);
-}
-
-soop::formula one_speaker_per_talk() {
-	return forall({t1,s1,s2,r1,sl1},
-		implies(
-			and_(
-				talk_assignment(t1,s1,r1,sl1),
-				talk_assignment(t1,s2,r1,sl1)),
-			equal(s1,s2)
 		)
 	);
 }
@@ -108,7 +91,6 @@ soop::ontology make_ontology() {
 	};
 	onto.add_axiom(uniqueness_of_talks());
 	onto.add_axiom(talk_assignment_is_typed());
-	onto.add_axiom(one_speaker_per_talk());
 	onto.add_axiom(only_speakers_hold_their_talk());
 	onto.add_axiom(types_are_no_instances());
 	onto.add_axiom(entities_have_only_one_type());
