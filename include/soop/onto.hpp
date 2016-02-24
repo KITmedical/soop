@@ -18,8 +18,7 @@ template<typename... Types>
 type_list_t<Types...> type_list;
 
 template<template<typename...>class... Preds>
-class pred_list{
-};
+class pred_list{};
 
 using axiom_list = std::vector<formula>;
 
@@ -65,14 +64,13 @@ private:
 	std::string axioms() const;
 	std::string entity_ids() const;
 
-	std::vector<formula> m_axioms;
+	axiom_list m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;
 	std::unordered_set<std::string> m_known_types;
-	std::vector<std::pair<std::string, std::size_t>> m_predicate_names;
+	std::vector<std::pair<std::string, std::size_t>> m_predicates;
 };
 
-class already_known_error: public std::invalid_argument {
-public:
+struct already_known_error: std::invalid_argument {
 	using std::invalid_argument::invalid_argument;
 };
 
@@ -117,7 +115,7 @@ std::tuple<const Ts&...> ontology::request_entities(const formula& description, 
 template<template<typename...>class P>
 void ontology::add_predicate() {
 	using Pred = P<get_meta_information>;
-	m_predicate_names.emplace_back(Pred::name(), Pred::rank());
+	m_predicates.emplace_back(Pred::name(), Pred::rank());
 }
 
 } // namespace soop

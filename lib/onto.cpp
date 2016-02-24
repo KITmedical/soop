@@ -11,8 +11,14 @@ ontology::ontology() {
 }
 
 std::size_t ontology::add_axiom(formula axiom) {
+	const auto axiom_id = m_axioms.size();
+	for (auto i: axiom.entity_ids()) {
+		m_entities.at(i).second.push_back(axiom_id);
+	}
 	m_axioms.emplace_back(std::move(axiom));
-	return m_axioms.size() - 1u;
+	// TODO: make transactional in the face of
+	// exceptions
+	return axiom_id;
 }
 
 void ontology::delete_axiom(std::size_t index) {
@@ -62,10 +68,10 @@ bool ontology::request(const formula& conjecture) const {
 		+ predicates
 		+ axioms
 		+ "(push)\n"
-		  "\t(assert (not " + conjecture.to_string() + "))\n"
+		  "\t(assert " + conjecture.to_string() + ")\n"
 		  "\t(check-sat)\n"
 		  "(pop)\n";
-	return !try_proof(problem);
+	return try_proof(problem);
 }
 
 bool ontology::check_sat() const {
@@ -156,7 +162,7 @@ std::string ontology::entities() const {
 
 std::string ontology::predicates() const {
 	// TODO: deleted predicates
-	return transform_if(m_predicate_names.begin(), m_predicate_names.end(),
+	return transform_if(m_predicates.begin(), m_predicates.end(),
 		[](const auto&){return true;},
 		[](const auto& p) {
 			return "(declare-fun " + p.first + " (" + repeat("Entity ",p.second) + ") Bool)\n";

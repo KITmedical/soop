@@ -40,6 +40,8 @@ TEST_CASE("instances") {
 	soop::variable<'y'> y;
 	soop::variable<'z'> z;
 	o.add_axiom(forall({x,y,z}, implies(and_(less(x, y), less(y, z)), less(x, z))));
+	o.add_axiom(forall({x,y}, implies(less(x, y), not_(less(y, x)))));
+	o.add_axiom(distinct(soop::type<e<v1>>, soop::type<e<v2>>, soop::type<e<v3>>));
 
 	soop::e<v1> i1{o};
 	soop::e<v2> i2{o};
@@ -49,15 +51,15 @@ TEST_CASE("instances") {
 	CHECK(o.request(instance_of(i1, soop::type<e<v1>>)));
 	CHECK(o.request(instance_of(i2, soop::type<e<v2>>)));
 
-	CHECK_FALSE(o.request(instance_of(i1, soop::type<e<v2>>)));
-	CHECK_FALSE(o.request(instance_of(i2, soop::type<e<v1>>)));
+	CHECK(o.request(not_(instance_of(i1, soop::type<e<v2>>))));
+	CHECK(o.request(not_(instance_of(i2, soop::type<e<v1>>))));
 
 	auto i3 = std::move(i1);
 
 	CHECK(o.request(instance_of(i3, soop::type<e<v1>>)));
-	CHECK_FALSE(o.request(instance_of(i3, soop::type<e<v2>>)));
+	CHECK(o.request(not_(instance_of(i3, soop::type<e<v2>>))));
 
-	CHECK_FALSE(o.request(test_pred1(i3, i2)));
+	CHECK(o.request(not_(test_pred1(i3, i2))));
 
 	o.add_axiom(test_pred1(i3, i2));
 

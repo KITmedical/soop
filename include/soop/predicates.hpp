@@ -25,6 +25,7 @@ public:
 	formula(P p);
 
 	std::string to_string() const;
+	const std::vector<std::size_t> entity_ids() const {return m_args;}
 
 	explicit operator bool() const { return m_formula != nullptr; }
 
