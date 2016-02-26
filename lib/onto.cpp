@@ -12,12 +12,23 @@ ontology::ontology() {
 
 std::size_t ontology::add_axiom(formula axiom) {
 	const auto axiom_id = m_axioms.size();
-	for (auto i: axiom.entity_ids()) {
+	// an axiom might refer to an entity more then
+	// once so get a list of the acutally used
+	// ids first:
+	auto used_ids = std::unordered_set<std::size_t>{};
+	for (const auto& id: axiom.entity_ids()) {
+		used_ids.insert(id);
+	}
+	for(auto id: used_ids) {
+		m_entities.at(id).second.reserve(m_entities.at(id).second.size() + 1u);
+	}
+	// At this point, the next statement is the last that may throw
+	// an exception and the first to do actual semantic changes
+	// to the data, which ensures transactional behavior
+	m_axioms.emplace_back(std::move(axiom));
+	for (auto i: used_ids) {
 		m_entities.at(i).second.push_back(axiom_id);
 	}
-	m_axioms.emplace_back(std::move(axiom));
-	// TODO: make transactional in the face of
-	// exceptions
 	return axiom_id;
 }
 
