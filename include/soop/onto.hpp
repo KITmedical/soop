@@ -32,6 +32,10 @@ public:
 	template <typename... Ts, template<typename...>class... Ps>
 	ontology(type_list_t<Ts...>, pred_list<Ps...> ps, axiom_list as = {});
 
+	ontology(ontology&&) noexcept;
+	ontology& operator=(ontology&&) noexcept;
+	~ontology();
+
 	std::size_t add_axiom(formula axiom);
 	void delete_axiom(std::size_t index);
 
@@ -63,6 +67,8 @@ private:
 	std::string predicates() const;
 	std::string axioms() const;
 	std::string entity_ids() const;
+
+	void reseat_ontology(ontology* new_location);
 
 	axiom_list m_axioms;
 	std::vector<std::pair<const entity*, std::vector<std::size_t>>> m_entities;

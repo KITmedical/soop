@@ -32,6 +32,32 @@ std::size_t ontology::add_axiom(formula axiom) {
 	return axiom_id;
 }
 
+ontology::ontology(ontology&& o) noexcept:
+	m_axioms(std::move(o.m_axioms)),
+	m_entities(std::move(o.m_entities)),
+	m_known_types(std::move(o.m_known_types)),
+	m_predicates(std::move(o.m_predicates))
+{
+	o.m_axioms.clear();
+	o.add_predicate<preds::instance_of_t>();
+	reseat_ontology(this);
+}
+
+ontology& ontology::operator=(ontology&& o) noexcept {
+	m_axioms = std::move(o.m_axioms);
+	m_entities = std::move(o.m_entities);
+	m_known_types = std::move(o.m_known_types);
+	m_predicates = std::move(o.m_predicates);
+	o.m_axioms.clear();
+	o.add_predicate<preds::instance_of_t>();
+	reseat_ontology(this);
+	return *this;
+}
+
+ontology::~ontology() {
+	reseat_ontology(nullptr);
+}
+
 void ontology::delete_axiom(std::size_t index) {
 	m_axioms.at(index) = {};
 }
@@ -61,7 +87,7 @@ std::size_t ontology::add_entity(entity& e, const std::type_info& type) {
 void ontology::delete_entity(std::size_t id) {
 	auto& data = m_entities.at(id);
 	for(auto& a: data.second) {
-		m_axioms.at(a) = {};
+		delete_axiom(a);
 	}
 	data = {};
 }
@@ -205,6 +231,14 @@ std::string ontology::entity_ids() const {
 	}
 	ret << std::numeric_limits<std::size_t>::max() << std::string(depth, ')') << '\n';
 	return ret.str();
+}
+
+void ontology::reseat_ontology(ontology* new_location) {
+	for(auto& entity: m_entities) {
+		if (entity.first) {
+			entity.first->m_ontology = new_location;
+		}
+	}
 }
 
 } // namespace soop

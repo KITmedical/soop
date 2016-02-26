@@ -33,7 +33,7 @@ public:
 
 private:
 	friend class ontology;
-	ontology* m_ontology = nullptr;
+	mutable ontology* m_ontology = nullptr;
 	std::size_t m_id = 0;
 };
 
