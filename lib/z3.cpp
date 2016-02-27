@@ -14,8 +14,8 @@ namespace soop {
 namespace {
 
 procxx::process& get_z3() {
-	static procxx::process z3{"z3", "-in", "-nw"};
-	static int dummy = [&]{
+	thread_local static procxx::process z3{"z3", "-in", "-nw"};
+	thread_local static int dummy = [&]{
 		z3.exec();
 		return 0;
 	}();
