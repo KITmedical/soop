@@ -31,6 +31,8 @@ struct z3_transaction {
 		get_z3() << "(pop)\n";
 		get_z3().output().sync();
 	}
+
+	z3_transaction(z3_transaction&&) = delete;
 };
 
 std::size_t result_id_from_line(const std::string& line) {
@@ -44,7 +46,7 @@ bool try_proof(const std::string& problem) {
 	z3_transaction transaction;
 	auto& z3 = get_z3();
 
-	z3 << problem;
+	z3 << problem << "(check-sat)\n";
 
 	z3.output().sync();
 	std::string line;

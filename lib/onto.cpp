@@ -104,10 +104,7 @@ bool ontology::request(const formula& conjecture) const {
 		+ entities
 		+ predicates
 		+ axioms
-		+ "(push)\n"
-		  "\t(assert " + conjecture.to_string() + ")\n"
-		  "\t(check-sat)\n"
-		  "(pop)\n";
+		+ "\t(assert " + conjecture.to_string() + ")\n";
 	return try_proof(problem);
 }
 
@@ -122,8 +119,7 @@ bool ontology::check_sat() const {
 		+ types
 		+ entities
 		+ predicates
-		+ axioms
-		+ "\t(check-sat)\n";
+		+ axioms;
 	return try_proof(problem);
 }
 
