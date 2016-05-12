@@ -51,13 +51,6 @@ soop::formula only_speakers_hold_their_talk() {
 			talk_assignment(t1, s1, r1, sl1))));
 }
 
-soop::formula types_are_no_instances() {
-	const soop::variable<'d'> d{};
-	const soop::variable<'b'> b{};
-	const soop::variable<'i'> i{};
-	return forall({d, i}, implies(instance_of(i, d), not_(exists({b}, (instance_of(d, b))))));
-}
-
 soop::formula entities_have_only_one_type() {
 	const soop::variable<'T','1'> T1{};
 	const soop::variable<'T','2'> T2{};
@@ -92,7 +85,6 @@ soop::ontology make_ontology() {
 	onto.add_axiom(uniqueness_of_talks());
 	onto.add_axiom(talk_assignment_is_typed());
 	onto.add_axiom(only_speakers_hold_their_talk());
-	onto.add_axiom(types_are_no_instances());
 	onto.add_axiom(entities_have_only_one_type());
 	onto.add_axiom(one_talk_per_speaker_per_slot());
 	return onto;

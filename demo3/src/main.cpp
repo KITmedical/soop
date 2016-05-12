@@ -22,7 +22,6 @@ int main() {
 	o.add_predicate<parent_of_t>();
 	soop::variable<'p'> p;
 	soop::variable<'c'> c;
-	o.add_axiom(not_(instance_of(soop::type<person_e>, soop::type<person_e>)));
 	o.add_axiom(forall({p, c}, implies(parent_of(p, c), and_(
 			instance_of(p, soop::type<person_e>),
 			instance_of(c, soop::type<person_e>)))));
