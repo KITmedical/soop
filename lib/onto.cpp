@@ -204,6 +204,11 @@ std::string ontology::predicates() const {
 
 std::string ontology::axioms() const {
 	auto ret = std::string{};
+	for (const auto& type: m_known_types) {
+		ret += "(assert (not (exists ((t Entity)) (instance_of ";
+		ret += type;
+		ret += " t))))\n";
+	}
 	for (const auto& axiom : m_axioms) {
 		if (not axiom) {
 			continue;
